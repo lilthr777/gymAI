@@ -21,7 +21,7 @@ public class CoachServiceImpl implements CoachService {
         Page<Coach> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Coach> wrapper = new LambdaQueryWrapper<>();
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(Coach::getName, keyword).or().like(Coach::getSpecialty, keyword);
+            wrapper.like(Coach::getName, keyword).or().like(Coach::getPhone, keyword).or().like(Coach::getSpecialty, keyword);
         }
         wrapper.orderByDesc(Coach::getCreatedAt);
         coachMapper.selectPage(page, wrapper);
