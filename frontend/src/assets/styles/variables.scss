@@ -1,0 +1,52 @@
+// ============================================
+// gymAI Design Tokens — "Iron & Rhythm"
+// ============================================
+
+// ── Palette ─────────────────────────────────
+$color-carbon: #1A1D20;
+$color-magnesium: #F2EFEA;
+$color-cobalt: #3B6EB0;
+$color-cobalt-light: #5B8EC8;
+$color-cobalt-dark: #2F5890;
+$color-iron-red: #C4523D;
+$color-lead: #6B6E73;
+$color-steel: #D9D5CE;
+$color-sheet: #FFFFFF;
+$color-rubber: #25282C;
+$color-ash: #3A3D40;
+
+// ── Dark mode palette ───────────────────────
+$dark-bg: #{$color-carbon};
+$dark-bg-secondary: #{$color-rubber};
+$dark-bg-card: #2A2D32;
+$dark-text: #E8E4DF;
+$dark-text-secondary: #9B9EA3;
+$dark-border: #3A3D42;
+
+// ── Typography ──────────────────────────────
+$font-display: 'Oswald', 'Impact', sans-serif;
+$font-body: 'Inter', -apple-system, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+$font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
+$font-size-base: 14px;
+$font-size-sm: 12px;
+$font-size-lg: 16px;
+$font-size-xl: 20px;
+$font-size-2xl: 28px;
+$font-size-3xl: 40px;
+
+// ── Layout ──────────────────────────────────
+$sidebar-width: 240px;
+$sidebar-collapsed-width: 64px;
+$header-height: 56px;
+$content-padding: 24px;
+$gap-unit: 24px;
+
+// ── Radii ───────────────────────────────────
+$radius-sm: 4px;
+$radius-md: 6px;
+$radius-lg: 10px;
+
+// ── Transitions ─────────────────────────────
+$transition-fast: 0.15s ease;
+$transition-base: 0.25s ease;
+$transition-slow: 0.4s ease;

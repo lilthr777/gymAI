@@ -1,0 +1,9 @@
+package com.gymai.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gymai.entity.MemberCourse;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface MemberCourseMapper extends BaseMapper<MemberCourse> {
+}

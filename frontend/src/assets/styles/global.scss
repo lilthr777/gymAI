@@ -1,0 +1,224 @@
+@use './variables.scss' as *;
+
+// ============================================
+// Element Plus CSS Variable Overrides
+// ============================================
+:root {
+  --el-color-primary: #{$color-cobalt};
+  --el-color-primary-light-3: #{$color-cobalt-light};
+  --el-color-primary-light-5: #85ADD9;
+  --el-color-primary-light-7: #B0CCE8;
+  --el-color-primary-light-8: #C8DCF0;
+  --el-color-primary-light-9: #E0ECF7;
+  --el-color-primary-dark-2: #{$color-cobalt-dark};
+  --el-color-success: #5C9A4F;
+  --el-color-warning: #D4953B;
+  --el-color-danger: #{$color-iron-red};
+  --el-color-info: #{$color-lead};
+
+  --el-bg-color: #{$color-magnesium};
+  --el-bg-color-overlay: #{$color-sheet};
+  --el-bg-color-page: #{$color-magnesium};
+  --el-border-color: #{$color-steel};
+  --el-border-color-light: #E8E4DF;
+  --el-border-color-lighter: #EFECE7;
+  --el-text-color-primary: #{$color-carbon};
+  --el-text-color-regular: #{$color-ash};
+  --el-text-color-secondary: #{$color-lead};
+  --el-text-color-placeholder: #9B9EA3;
+
+  --el-border-radius-base: #{$radius-md};
+  --el-border-radius-small: #{$radius-sm};
+  --el-border-radius-round: 20px;
+  --el-box-shadow-light: 0 1px 3px rgba(26, 29, 32, 0.06);
+  --el-box-shadow: 0 2px 8px rgba(26, 29, 32, 0.08);
+
+  --el-font-family: #{$font-body};
+}
+
+// ============================================
+// Base Reset
+// ============================================
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  font-family: $font-body;
+  font-size: $font-size-base;
+  color: $color-carbon;
+  background-color: $color-magnesium;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ============================================
+// Scrollbar
+// ============================================
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C4C0B8;
+  border-radius: 20px;
+
+  &:hover {
+    background: #A8A49C;
+  }
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+// ============================================
+// Utility Classes
+// ============================================
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// ============================================
+// Element Plus Fine-tune Overrides
+// ============================================
+
+// Buttons — less rounded, cleaner
+.el-button {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+// Menu items in sidebar
+.el-menu {
+  --el-menu-bg-color: transparent;
+  --el-menu-text-color: #9B9EA3;
+  --el-menu-hover-bg-color: rgba(255, 255, 255, 0.04);
+  --el-menu-active-color: #{$color-sheet};
+}
+
+// Table — tighter header
+.el-table {
+  th.el-table__cell {
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-lead;
+  }
+}
+
+// Dialog — less padding bloat
+.el-dialog {
+  --el-dialog-padding-primary: 24px;
+}
+
+.el-dialog__header {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+// Card
+.el-card {
+  --el-card-border-color: #{$color-steel};
+}
+
+// Tags — slightly smaller
+.el-tag {
+  font-weight: 500;
+}
+
+// Input — tighter focus ring
+.el-input {
+  --el-input-focus-border-color: #{$color-cobalt};
+}
+
+// ============================================
+// Dark Mode
+// ============================================
+html.dark {
+  color: $dark-text;
+  background-color: $dark-bg;
+
+  #app {
+    background-color: $dark-bg;
+  }
+
+  // Element Plus dark overrides
+  --el-bg-color: #{$dark-bg};
+  --el-bg-color-overlay: #{$dark-bg-secondary};
+  --el-bg-color-page: #{$dark-bg};
+  --el-border-color: #{$dark-border};
+  --el-border-color-light: #353840;
+  --el-border-color-lighter: #2E3138;
+  --el-text-color-primary: #{$dark-text};
+  --el-text-color-regular: #C5C0B8;
+  --el-text-color-secondary: #{$dark-text-secondary};
+  --el-text-color-placeholder: #6B6E73;
+  --el-box-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --el-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  --el-color-primary-light-9: rgba(59, 110, 176, 0.15);
+
+  // Table dark
+  .el-table {
+    --el-table-bg-color: #{$dark-bg-secondary};
+    --el-table-tr-bg-color: #{$dark-bg-secondary};
+    --el-table-header-bg-color: #{$dark-bg};
+    --el-table-row-hover-bg-color: #{$dark-bg-card};
+    --el-table-border-color: #{$dark-border};
+    --el-table-text-color: #{$dark-text};
+    --el-table-header-text-color: #{$dark-text-secondary};
+  }
+
+  .el-pagination {
+    --el-pagination-bg-color: #{$dark-bg-secondary};
+    --el-pagination-text-color: #{$dark-text};
+    --el-pagination-button-bg-color: #{$dark-bg-secondary};
+  }
+
+  .el-dialog {
+    --el-dialog-bg-color: #{$dark-bg-secondary};
+  }
+
+  .el-form-item__label {
+    color: $dark-text-secondary;
+  }
+
+  .el-empty__description p {
+    color: $dark-text-secondary;
+  }
+
+  .el-popper.is-dark {
+    color: $dark-text;
+  }
+}
+
+// ============================================
+// Reduced Motion
+// ============================================
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
