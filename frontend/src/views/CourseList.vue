@@ -6,6 +6,8 @@
       :total="total"
       v-model:page="page"
       v-model:page-size="pageSize"
+      @search="handleSearch"
+      @reset="handleSearch"
       @load="fetchList"
     >
       <template #search>
@@ -22,6 +24,20 @@
           </template>
         </el-input>
         <el-select
+          v-model="filterCoachId"
+          placeholder="授课教练"
+          clearable
+          style="width: 140px; margin-left: 12px"
+          @change="handleSearch"
+        >
+          <el-option
+            v-for="coach in coachOptions"
+            :key="coach.id"
+            :label="coach.name"
+            :value="coach.id"
+          />
+        </el-select>
+        <el-select
           v-model="filterStatus"
           placeholder="课程状态"
           clearable
@@ -32,10 +48,6 @@
           <el-option label="已满" :value="2" />
           <el-option label="已取消" :value="0" />
         </el-select>
-        <el-button type="primary" @click="handleSearch" style="margin-left: 12px">
-          <el-icon><Search /></el-icon>
-          搜索
-        </el-button>
       </template>
 
       <template #toolbar>
@@ -45,7 +57,6 @@
         </el-button>
       </template>
 
-      <el-table-column type="index" label="#" width="60" />
       <el-table-column prop="name" label="课程名称" min-width="140" />
       <el-table-column label="授课教练" width="120">
         <template #default="{ row }">
@@ -177,6 +188,7 @@ const page = ref(1)
 const pageSize = ref(10)
 const keyword = ref('')
 const filterStatus = ref<number | undefined>(undefined)
+const filterCoachId = ref<number | undefined>(undefined)
 
 const dialogVisible = ref(false)
 const isEdit = ref(false)
@@ -234,6 +246,7 @@ const fetchList = async () => {
       pageNum: page.value,
       pageSize: pageSize.value,
       keyword: keyword.value,
+      coachId: filterCoachId.value,
     })
     list.value = (res.data as any)?.records ?? []
     total.value = (res.data as any)?.total ?? 0

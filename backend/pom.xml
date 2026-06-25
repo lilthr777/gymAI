@@ -25,6 +25,7 @@
         <jjwt.version>0.12.5</jjwt.version>
         <knife4j.version>4.3.0</knife4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
     </properties>
 
     <dependencyManagement>

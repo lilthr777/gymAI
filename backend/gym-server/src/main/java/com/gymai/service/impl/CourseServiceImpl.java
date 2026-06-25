@@ -17,11 +17,14 @@ public class CourseServiceImpl implements CourseService {
     private final CourseMapper courseMapper;
 
     @Override
-    public Result<Page<Course>> page(int pageNum, int pageSize, String keyword) {
+    public Result<Page<Course>> page(int pageNum, int pageSize, String keyword, Long coachId) {
         Page<Course> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Course> wrapper = new LambdaQueryWrapper<>();
         if (StringUtils.hasText(keyword)) {
             wrapper.like(Course::getName, keyword);
+        }
+        if (coachId != null) {
+            wrapper.eq(Course::getCoachId, coachId);
         }
         wrapper.orderByDesc(Course::getCourseDate).orderByAsc(Course::getStartTime);
         courseMapper.selectPage(page, wrapper);

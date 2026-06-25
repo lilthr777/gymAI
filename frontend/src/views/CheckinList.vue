@@ -6,6 +6,8 @@
       :total="total"
       v-model:page="page"
       v-model:page-size="pageSize"
+      @search="handleSearch"
+      @reset="handleSearch"
       @load="fetchList"
     >
       <template #search>
@@ -30,10 +32,6 @@
           value-format="YYYY-MM-DD"
           style="width: 180px; margin-left: 12px"
         />
-        <el-button type="primary" @click="handleSearch" style="margin-left: 12px">
-          <el-icon><Search /></el-icon>
-          搜索
-        </el-button>
       </template>
 
       <template #toolbar>
@@ -43,7 +41,6 @@
         </el-button>
       </template>
 
-      <el-table-column type="index" label="#" width="60" />
       <el-table-column label="会员" width="140">
         <template #default="{ row }">
           <span>{{ row.memberName ?? `会员 #${row.memberId}` }}</span>

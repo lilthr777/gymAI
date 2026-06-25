@@ -6,6 +6,8 @@
       :total="total"
       v-model:page="page"
       v-model:page-size="pageSize"
+      @search="handleSearch"
+      @reset="handleSearch"
       @load="fetchList"
     >
       <template #search>
@@ -21,10 +23,6 @@
             <el-icon><Search /></el-icon>
           </template>
         </el-input>
-        <el-button type="primary" @click="handleSearch" style="margin-left: 12px">
-          <el-icon><Search /></el-icon>
-          搜索
-        </el-button>
       </template>
 
       <template #toolbar>
@@ -34,7 +32,6 @@
         </el-button>
       </template>
 
-      <el-table-column type="index" label="#" width="60" />
       <el-table-column prop="name" label="姓名" min-width="100" />
       <el-table-column prop="phone" label="手机号" width="130" />
       <el-table-column label="性别" width="80" align="center">

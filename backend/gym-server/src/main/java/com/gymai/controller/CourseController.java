@@ -18,8 +18,9 @@ public class CourseController {
     public Result<Page<Course>> page(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String keyword) {
-        return courseService.page(pageNum, pageSize, keyword);
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long coachId) {
+        return courseService.page(pageNum, pageSize, keyword, coachId);
     }
 
     @GetMapping("/{id}")

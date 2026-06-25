@@ -31,11 +31,12 @@ public class AuthServiceImpl implements AuthService {
         if (!passwordEncoder.matches(password, admin.getPassword())) {
             return Result.error(401, "用户名或密码错误");
         }
-        String token = jwtUtil.generateToken(username);
+        String token = jwtUtil.generateToken(username, admin.getRole());
         Map<String, String> data = new HashMap<>();
         data.put("token", token);
         data.put("nickname", admin.getNickname());
         data.put("avatar", admin.getAvatar());
+        data.put("role", admin.getRole());
         return Result.ok(data);
     }
 }

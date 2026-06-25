@@ -104,6 +104,7 @@ export interface LoginResult {
   token: string
   nickname: string
   avatar: string
+  role: string
 }
 
 // 聊天消息

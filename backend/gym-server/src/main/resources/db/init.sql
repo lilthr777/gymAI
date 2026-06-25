@@ -89,7 +89,7 @@ CREATE TABLE member_course (
 
 -- 插入默认管理员账号 (密码: admin123)
 INSERT INTO admin (username, password, nickname, role) VALUES
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5Eh', '系统管理员', 'ADMIN');
+('admin', '$2a$10$nuYKUvkwd7yqb.FBgYrDYOi2lgJHuwsVgny86/xybD8OCK1472qAy', '系统管理员', 'ADMIN');
 
 -- 插入测试会员数据
 INSERT INTO member (name, phone, gender, card_type, card_start_date, card_end_date) VALUES

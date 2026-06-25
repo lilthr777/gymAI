@@ -8,6 +8,7 @@ export const useUserStore = defineStore(
     const token = ref('')
     const nickname = ref('')
     const avatar = ref('')
+    const role = ref('')
 
     const isLoggedIn = () => !!token.value
 
@@ -15,15 +16,19 @@ export const useUserStore = defineStore(
       token.value = info.token
       nickname.value = info.nickname
       avatar.value = info.avatar
+      role.value = info.role
     }
 
     const logout = () => {
       token.value = ''
       nickname.value = ''
       avatar.value = ''
+      role.value = ''
     }
 
-    return { token, nickname, avatar, isLoggedIn, setLoginInfo, logout }
+    const hasRole = (requiredRole: string) => role.value === requiredRole
+
+    return { token, nickname, avatar, role, isLoggedIn, setLoginInfo, logout, hasRole }
   },
   {
     persist: true,

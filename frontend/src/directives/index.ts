@@ -1,13 +1,17 @@
-import type { App } from 'vue'
+import type { App, DirectiveBinding } from 'vue'
+import { useUserStore } from '@/stores/user'
 
-// v-permission: 权限控制指令
+function hasPermission(requiredRole: string): boolean {
+  const userStore = useUserStore()
+  return userStore.role === requiredRole
+}
+
+// v-permission: 权限控制指令，传入角色名，无权限则移除元素
 const permission = {
-  mounted(el: HTMLElement, binding: any) {
+  mounted(el: HTMLElement, binding: DirectiveBinding) {
     const { value } = binding
-    if (value) {
-      // 示例：根据角色控制显示
-      // const userStore = useUserStore()
-      // if (!hasPermission(value)) el.parentNode?.removeChild(el)
+    if (value && !hasPermission(value)) {
+      el.parentNode?.removeChild(el)
     }
   },
 }
