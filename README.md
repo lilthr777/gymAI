@@ -48,28 +48,39 @@ gymAI/
 
 ## 快速开始
 
-### Docker（推荐）
-
-```bash
-# 设置 AI API Key
-export DEEPSEEK_API_KEY=your_key
-
-# 启动所有服务
-docker compose up -d
-```
-
 ### 本地开发
 
 ```bash
-# 启动后端
-cd backend/gym-server && mvn spring-boot:run
-cd backend/springai-model && mvn spring-boot:run
-
-# 启动前端
-cd frontend && npm install && npm run dev
+# 一键启动（需要 Git Bash / WSL）
+./start.sh
 ```
 
-访问 `http://localhost:3000`，默认账号 `admin` / `admin123`。
+```bash
+# 停止所有服务
+./stop.sh
+```
+
+> `start.sh` 通过 nohup 分别启动后端（8080 / 8088）与前端（3000），日志写入 `/tmp/`。
+
+### 手动启动
+
+```bash
+# 后端
+cd backend/gym-server && mvn spring-boot:run      # 端口 8080
+cd backend/springai-model && mvn spring-boot:run  # 端口 8088
+
+# 前端
+cd frontend && npm install && npm run dev          # 端口 3000
+```
+
+### Docker（可选）
+
+```bash
+export DEEPSEEK_API_KEY=your_key
+docker compose up -d
+```
+
+访问 `http://localhost:3000`，默认账号 `admin` / `admin123`。Swagger 文档 `http://localhost:8080/swagger-ui.html`。
 
 ## 实现亮点
 
