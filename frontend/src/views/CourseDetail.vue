@@ -1,5 +1,8 @@
 <template>
   <div class="course-detail" v-if="course">
+    <div class="page-nav">
+      <el-button text @click="$router.back()"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+    </div>
     <div class="detail-header">
       <h2>{{ course.name }}</h2>
       <el-tag :type="statusTagType">{{ statusText }}</el-tag>
@@ -57,6 +60,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { ArrowLeft } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import { courseApi, checkinApi } from '@/api'
@@ -130,6 +134,10 @@ onMounted(async () => {
 <style scoped lang="scss">
 .course-detail {
   padding: 16px;
+}
+
+.page-nav {
+  margin-bottom: 12px;
 }
 
 .detail-header {

@@ -1,5 +1,8 @@
 <template>
   <div class="coach-detail" v-if="coach">
+    <div class="page-nav">
+      <el-button text @click="$router.back()"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+    </div>
     <div class="coach-hero">
       <el-avatar :size="72" icon="UserFilled" :src="coach.avatar" />
       <h2>{{ coach.name }}</h2>
@@ -28,6 +31,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { ArrowLeft } from '@element-plus/icons-vue'
 import { coachApi, courseApi } from '@/api'
 import type { Coach, Course } from '@/types'
 import CourseCard from '@/components/CourseCard.vue'
@@ -59,6 +63,10 @@ onMounted(async () => {
 <style scoped lang="scss">
 .coach-detail {
   padding: 16px;
+}
+
+.page-nav {
+  margin-bottom: 12px;
 }
 
 .coach-hero {
