@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class Checkin {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long memberId;
+    private Long userId;
     private Long courseId;
     private LocalDateTime checkinTime;
     private Integer status;

@@ -20,8 +20,9 @@ public class CoachServiceImpl implements CoachService {
     public Result<Page<Coach>> page(int pageNum, int pageSize, String keyword) {
         Page<Coach> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Coach> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Coach::getStatus, 1);
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(Coach::getName, keyword).or().like(Coach::getPhone, keyword).or().like(Coach::getSpecialty, keyword);
+            wrapper.like(Coach::getName, keyword).or().like(Coach::getSpecialty, keyword);
         }
         wrapper.orderByDesc(Coach::getCreatedAt);
         coachMapper.selectPage(page, wrapper);
@@ -31,23 +32,5 @@ public class CoachServiceImpl implements CoachService {
     @Override
     public Result<Coach> getById(Long id) {
         return Result.ok(coachMapper.selectById(id));
-    }
-
-    @Override
-    public Result<?> save(Coach coach) {
-        coachMapper.insert(coach);
-        return Result.ok();
-    }
-
-    @Override
-    public Result<?> update(Coach coach) {
-        coachMapper.updateById(coach);
-        return Result.ok();
-    }
-
-    @Override
-    public Result<?> delete(Long id) {
-        coachMapper.deleteById(id);
-        return Result.ok();
     }
 }

@@ -1,11 +1,11 @@
-// 通用响应类型
+// 通用响应
 export interface ApiResponse<T = any> {
   code: number
   message: string
   data: T
 }
 
-// 分页类型
+// 分页
 export interface PageResult<T> {
   records: T[]
   total: number
@@ -14,28 +14,18 @@ export interface PageResult<T> {
   pages: number
 }
 
-// 管理员
-export interface Admin {
-  id: number
+// 用户
+export interface User {
+  id?: number
   username: string
+  phone: string
   nickname: string
   avatar: string
-  role: string
-}
-
-// 会员
-export interface Member {
-  id?: number
-  name: string
-  phone: string
   gender: number
-  cardType: string
+  cardType?: string
   cardStartDate?: string
   cardEndDate?: string
   status: number
-  remark?: string
-  createdAt?: string
-  updatedAt?: string
 }
 
 // 教练
@@ -57,6 +47,7 @@ export interface Course {
   id?: number
   name: string
   coachId: number
+  coachName?: string
   courseDate: string
   startTime: string
   endTime: string
@@ -64,47 +55,47 @@ export interface Course {
   currentCount: number
   description: string
   status: number
-  createdAt?: string
-  updatedAt?: string
+  registered?: boolean
 }
 
-// 签到记录
+// 签到
 export interface Checkin {
   id?: number
-  memberId: number
+  userId: number
   courseId: number
+  courseName?: string
   checkinTime?: string
   status: number
   remark?: string
 }
 
-// 仪表盘统计
-export interface DashboardStats {
-  totalMembers: number
-  totalCoaches: number
-  totalCourses: number
-  todayCheckins: number
+// 首页数据
+export interface HomeData {
+  myCourseCount: number
+  monthCheckins: number
+  upcomingCourses: Course[]
+  coaches: Coach[]
 }
 
-// 图表数据
-export interface ChartDataItem {
-  name: string
-  value: number
-  [key: string]: any
-}
-
-// 登录请求
+// 登录表单
 export interface LoginForm {
   username: string
   password: string
 }
 
-// 登录响应
-export interface LoginResult {
+// 注册表单
+export interface RegisterForm {
+  username: string
+  phone: string
+  password: string
+}
+
+// 登录/注册响应
+export interface AuthResult {
   token: string
   nickname: string
   avatar: string
-  role: string
+  userId: string
 }
 
 // 聊天消息
@@ -119,8 +110,9 @@ export interface ChatMessage {
 declare module 'vue-router' {
   interface RouteMeta {
     title?: string
-    icon?: string
+    showTabBar?: boolean
     requiresAuth?: boolean
+    icon?: string
   }
 }
 

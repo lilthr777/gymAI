@@ -4,23 +4,23 @@
     <div class="login-brand">
       <div class="brand-inner">
         <h1 class="brand-logo">gymAI</h1>
-        <p class="brand-tagline">智能健身房管理系统</p>
+        <p class="brand-tagline">你的专属健身伙伴</p>
         <div class="brand-features">
           <div class="feature-item">
             <span class="feature-dot"></span>
-            <span>会员全生命周期管理</span>
+            <span>海量精品健身课程</span>
           </div>
           <div class="feature-item">
             <span class="feature-dot"></span>
-            <span>智能排课与签到</span>
+            <span>专业教练团队</span>
           </div>
           <div class="feature-item">
             <span class="feature-dot"></span>
-            <span>数据可视化分析</span>
+            <span>一键预约 轻松签到</span>
           </div>
           <div class="feature-item">
             <span class="feature-dot"></span>
-            <span>AI 智能助手</span>
+            <span>AI 健身助手随时陪伴</span>
           </div>
         </div>
       </div>
@@ -67,7 +67,9 @@
           </el-form-item>
         </el-form>
 
-        <p class="form-hint">测试账号：admin / admin123</p>
+        <p class="form-hint">
+          还没有账号？<router-link to="/register" class="register-link">立即注册</router-link>
+        </p>
       </div>
     </div>
   </div>
@@ -114,7 +116,7 @@ const handleLogin = async () => {
       const res = await authApi.login(form)
       userStore.setLoginInfo(res.data)
       ElMessage.success('登录成功')
-      const redirect = (route.query.redirect as string) || '/dashboard'
+      const redirect = (route.query.redirect as string) || '/home'
       router.push(redirect)
     } catch {
       // error handled by interceptor
@@ -240,6 +242,16 @@ const handleLogin = async () => {
   text-align: center;
   color: #B0B4BA;
   font-size: 12px;
+
+  .register-link {
+    color: $color-cobalt;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 // ── Responsive ───────────────────────────────

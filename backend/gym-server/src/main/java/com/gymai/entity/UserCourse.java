@@ -5,11 +5,11 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("member_course")
-public class MemberCourse {
+@TableName("user_course")
+public class UserCourse {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long memberId;
+    private Long userId;
     private Long courseId;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime registerTime;

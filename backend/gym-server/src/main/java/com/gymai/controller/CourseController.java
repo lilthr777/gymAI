@@ -2,9 +2,11 @@ package com.gymai.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymai.common.Result;
+import com.gymai.config.UserPrincipal;
 import com.gymai.entity.Course;
 import com.gymai.service.CourseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,19 +30,21 @@ public class CourseController {
         return courseService.getById(id);
     }
 
-    @PostMapping
-    public Result<?> save(@RequestBody Course course) {
-        return courseService.save(course);
+    @PostMapping("/{id}/register")
+    public Result<?> register(@AuthenticationPrincipal UserPrincipal principal, @PathVariable Long id) {
+        return courseService.register(principal.userId(), id);
     }
 
-    @PutMapping("/{id}")
-    public Result<?> update(@PathVariable Long id, @RequestBody Course course) {
-        course.setId(id);
-        return courseService.update(course);
+    @PostMapping("/{id}/cancel")
+    public Result<?> cancel(@AuthenticationPrincipal UserPrincipal principal, @PathVariable Long id) {
+        return courseService.cancel(principal.userId(), id);
     }
 
-    @DeleteMapping("/{id}")
-    public Result<?> delete(@PathVariable Long id) {
-        return courseService.delete(id);
+    @GetMapping("/my")
+    public Result<Page<Course>> myCourses(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return courseService.myCourses(principal.userId(), pageNum, pageSize);
     }
 }

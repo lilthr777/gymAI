@@ -27,7 +27,7 @@ public class SecurityConfig {
             .cors(cors -> {})
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/doc.html", "/v3/api-docs/**", "/webjars/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/coaches/**", "/api/courses/**", "/doc.html", "/v3/api-docs/**", "/webjars/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

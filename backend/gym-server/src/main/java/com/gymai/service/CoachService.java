@@ -7,7 +7,4 @@ import com.gymai.entity.Coach;
 public interface CoachService {
     Result<Page<Coach>> page(int pageNum, int pageSize, String keyword);
     Result<Coach> getById(Long id);
-    Result<?> save(Coach coach);
-    Result<?> update(Coach coach);
-    Result<?> delete(Long id);
 }

@@ -2,18 +2,24 @@ package com.gymai.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("admin")
-public class Admin {
+@TableName("user")
+public class User {
     @TableId(type = IdType.AUTO)
     private Long id;
     private String username;
+    private String phone;
     private String password;
     private String nickname;
     private String avatar;
-    private String role;
+    private Integer gender;
+    private String cardType;
+    private LocalDate cardStartDate;
+    private LocalDate cardEndDate;
+    private Integer status;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
     @TableField(fill = FieldFill.INSERT_UPDATE)

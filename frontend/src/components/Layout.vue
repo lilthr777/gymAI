@@ -1,75 +1,51 @@
 <template>
   <div class="app-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar" :class="{ collapsed: appStore.sidebarCollapsed }">
-      <div class="sidebar-brand">
-        <span class="sidebar-logo">gymAI</span>
+    <!-- 顶部导航 -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-brand">gymAI</span>
       </div>
-
-      <nav class="sidebar-nav">
-        <el-menu
-          :default-active="route.path"
-          :collapse="appStore.sidebarCollapsed"
-          :collapse-transition="false"
-          router
-        >
-          <el-menu-item v-for="item in menuItems" :key="item.path" :index="item.path">
-            <el-icon><component :is="item.icon" /></el-icon>
-            <template #title>{{ item.title }}</template>
-          </el-menu-item>
-        </el-menu>
-      </nav>
-
-      <div class="sidebar-footer">
-        <button class="collapse-trigger" @click="appStore.toggleSidebar">
-          <el-icon :size="18"><Fold v-if="!appStore.sidebarCollapsed" /><Expand v-else /></el-icon>
+      <div class="topbar-right">
+        <button class="theme-toggle" @click="appStore.toggleTheme">
+          <el-icon :size="18"><Moon v-if="!appStore.isDark" /><Sunny v-else /></el-icon>
         </button>
-      </div>
-    </aside>
-
-    <!-- Main -->
-    <div class="main-area">
-      <!-- Header -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <el-breadcrumb separator="">
-            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-            <span class="breadcrumb-sep">/</span>
-            <el-breadcrumb-item v-if="route.meta.title">{{ route.meta.title }}</el-breadcrumb-item>
-          </el-breadcrumb>
-        </div>
-
-        <div class="topbar-right">
-          <button class="theme-toggle" @click="appStore.toggleTheme" :title="appStore.isDark ? '浅色模式' : '深色模式'">
-            <el-icon :size="18"><Moon v-if="!appStore.isDark" /><Sunny v-else /></el-icon>
+        <el-dropdown v-if="userStore.isLoggedIn()" trigger="click" placement="bottom-end">
+          <button class="user-trigger">
+            <el-avatar :size="28" icon="UserFilled" />
           </button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="router.push('/profile')">个人资料</el-dropdown-item>
+              <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+    </header>
 
-          <el-dropdown trigger="click" placement="bottom-end">
-            <button class="user-trigger">
-              <el-avatar :size="30" icon="UserFilled" />
-              <span class="user-name">{{ userStore.nickname || '管理员' }}</span>
-            </button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item @click="handleLogout">
-                  <el-icon><SwitchButton /></el-icon>
-                  退出登录
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </div>
-      </header>
+    <!-- 内容区 -->
+    <main class="main-content">
+      <router-view />
+    </main>
 
-      <!-- Content -->
-      <main class="main-content">
-        <router-view />
-      </main>
-    </div>
+    <!-- 底部导航栏 -->
+    <nav v-if="showTabBar" class="tabbar">
+      <div
+        v-for="tab in tabs"
+        :key="tab.path"
+        class="tabbar-item"
+        :class="{ active: isTabActive(tab) }"
+        @click="router.push(tab.path)"
+      >
+        <el-icon :size="20"><component :is="tab.icon" /></el-icon>
+        <span class="tabbar-label">{{ tab.label }}</span>
+      </div>
+    </nav>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useUserStore } from '@/stores/user'
@@ -80,14 +56,23 @@ const router = useRouter()
 const appStore = useAppStore()
 const userStore = useUserStore()
 
-const menuItems = [
-  { path: '/dashboard', title: '仪表盘', icon: 'Odometer' },
-  { path: '/members', title: '会员管理', icon: 'User' },
-  { path: '/coaches', title: '教练管理', icon: 'Avatar' },
-  { path: '/courses', title: '课程管理', icon: 'Calendar' },
-  { path: '/checkins', title: '签到记录', icon: 'Check' },
-  { path: '/ai-chat', title: 'AI 助手', icon: 'ChatDotRound' },
+const tabs = [
+  { path: '/home', label: '首页', icon: 'HomeFilled' },
+  { path: '/courses', label: '课程', icon: 'Calendar' },
+  { path: '/coaches', label: '教练', icon: 'Avatar' },
+  { path: '/ai-chat', label: 'AI助手', icon: 'ChatDotRound' },
+  { path: '/profile', label: '我的', icon: 'User' },
 ]
+
+const showTabBar = computed(() => route.meta.showTabBar !== false)
+
+const isTabActive = (tab: { path: string }) => {
+  if (tab.path === '/home') return route.path === '/home'
+  if (tab.path === '/courses') return route.path.startsWith('/courses')
+  if (tab.path === '/coaches') return route.path.startsWith('/coaches')
+  if (tab.path === '/profile') return ['/profile', '/my-courses', '/my-checkins'].includes(route.path)
+  return route.path === tab.path
+}
 
 const handleLogout = () => {
   userStore.logout()
@@ -98,176 +83,30 @@ const handleLogout = () => {
 <style scoped lang="scss">
 .app-layout {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   overflow: hidden;
 }
 
-// ── Sidebar ──────────────────────────────────
-.sidebar {
-  width: $sidebar-width;
-  flex-shrink: 0;
-  background: $color-carbon;
-  display: flex;
-  flex-direction: column;
-  transition: width $transition-base;
-  overflow: hidden;
-
-  &.collapsed {
-    width: $sidebar-collapsed-width;
-  }
-}
-
-.sidebar-brand {
-  height: $header-height;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  flex-shrink: 0;
-
-  .sidebar-logo {
-    font-family: $font-display;
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    color: $color-sheet;
-    white-space: nowrap;
-  }
-}
-
-.sidebar-nav {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 0;
-
-  :deep(.el-menu) {
-    border-right: none;
-    background: transparent;
-
-    .el-menu-item {
-      margin: 2px 12px;
-      border-radius: $radius-md;
-      height: 40px;
-      line-height: 40px;
-      color: #9B9EA3;
-      font-size: $font-size-base;
-      font-family: $font-body;
-      border-left: 2px solid transparent;
-      transition: color $transition-fast, border-color $transition-fast, background $transition-fast;
-
-      &:hover {
-        color: #D0CCC5;
-        background: rgba(255, 255, 255, 0.04);
-      }
-
-      &.is-active {
-        color: $color-sheet;
-        background: rgba(255, 255, 255, 0.06);
-        border-left-color: $color-cobalt;
-        border-radius: 0 $radius-md $radius-md 0;
-        margin-left: 10px;
-      }
-
-      .el-icon {
-        font-size: 18px;
-      }
-    }
-
-    &.el-menu--collapse {
-      .el-menu-item {
-        margin: 2px 8px;
-        border-left: none;
-        justify-content: center;
-        padding: 0 !important;
-
-        &.is-active {
-          border-left: none;
-          margin-left: 8px;
-          border-radius: $radius-md;
-          background: rgba(255, 255, 255, 0.08);
-        }
-      }
-    }
-  }
-}
-
-.sidebar-footer {
-  padding: 12px;
-  flex-shrink: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.collapse-trigger {
-  width: 100%;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: #6B6E73;
-  cursor: pointer;
-  border-radius: $radius-md;
-  transition: color $transition-fast, background $transition-fast;
-
-  &:hover {
-    color: #D0CCC5;
-    background: rgba(255, 255, 255, 0.04);
-  }
-}
-
-// ── Main Area ────────────────────────────────
-.main-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
 // ── Topbar ───────────────────────────────────
 .topbar {
-  height: $header-height;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 16px;
   background: $color-sheet;
   border-bottom: 1px solid $color-steel;
   flex-shrink: 0;
+  z-index: 10;
 }
 
-.topbar-left {
-  display: flex;
-  align-items: center;
-
-  :deep(.el-breadcrumb) {
-    font-size: 13px;
-
-    .el-breadcrumb__item {
-      display: flex;
-      align-items: center;
-    }
-
-    .el-breadcrumb__inner {
-      color: $color-lead;
-      font-weight: 400;
-      transition: color $transition-fast;
-
-      &:hover {
-        color: $color-carbon;
-      }
-    }
-
-    .el-breadcrumb__item:last-child .el-breadcrumb__inner {
-      color: $color-carbon;
-      font-weight: 500;
-    }
-  }
-}
-
-.breadcrumb-sep {
-  margin: 0 8px;
-  color: $color-steel;
-  font-size: 13px;
+.topbar-brand {
+  font-family: $font-display;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: $color-carbon;
 }
 
 .topbar-right {
@@ -277,20 +116,19 @@ const handleLogout = () => {
 }
 
 .theme-toggle {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid $color-steel;
+  border: none;
   background: transparent;
-  border-radius: $radius-md;
   color: $color-lead;
   cursor: pointer;
-  transition: all $transition-fast;
+  border-radius: $radius-md;
+  transition: color $transition-fast;
 
   &:hover {
-    border-color: $color-cobalt;
     color: $color-cobalt;
   }
 }
@@ -298,22 +136,15 @@ const handleLogout = () => {
 .user-trigger {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 8px 4px 4px;
   border: none;
   background: transparent;
-  border-radius: $radius-md;
   cursor: pointer;
-  transition: background $transition-fast;
+  padding: 2px;
+  border-radius: 50%;
+  transition: box-shadow $transition-fast;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.03);
-  }
-
-  .user-name {
-    font-size: 13px;
-    color: $color-ash;
-    font-family: $font-body;
+    box-shadow: 0 0 0 2px $color-steel;
   }
 }
 
@@ -322,6 +153,47 @@ const handleLogout = () => {
   flex: 1;
   overflow-y: auto;
   background: $color-magnesium;
+  padding-bottom: 0;
+}
+
+// ── TabBar ───────────────────────────────────
+.tabbar {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: $color-sheet;
+  border-top: 1px solid $color-steel;
+  flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.tabbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex: 1;
+  height: 100%;
+  cursor: pointer;
+  color: $color-lead;
+  transition: color $transition-fast;
+  padding: 4px 0;
+
+  &:hover {
+    color: $color-cobalt-light;
+  }
+
+  &.active {
+    color: $color-cobalt;
+  }
+}
+
+.tabbar-label {
+  font-size: 10px;
+  font-family: $font-body;
+  line-height: 1;
 }
 
 // ── Dark Mode ────────────────────────────────
@@ -329,48 +201,19 @@ html.dark {
   .topbar {
     background: $dark-bg-secondary;
     border-bottom-color: $dark-border;
-
-    :deep(.el-breadcrumb) {
-      .el-breadcrumb__inner {
-        color: $dark-text-secondary;
-
-        &:hover {
-          color: $dark-text;
-        }
-      }
-
-      .el-breadcrumb__item:last-child .el-breadcrumb__inner {
-        color: $dark-text;
-      }
-    }
   }
 
-  .breadcrumb-sep {
-    color: $dark-border;
-  }
-
-  .theme-toggle {
-    border-color: $dark-border;
-    color: $dark-text-secondary;
-
-    &:hover {
-      border-color: $color-cobalt;
-      color: $color-cobalt;
-    }
-  }
-
-  .user-trigger {
-    &:hover {
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .user-name {
-      color: $dark-text;
-    }
+  .topbar-brand {
+    color: $dark-text;
   }
 
   .main-content {
     background: $dark-bg;
+  }
+
+  .tabbar {
+    background: $dark-bg-secondary;
+    border-top-color: $dark-border;
   }
 }
 </style>

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { LoginResult } from '@/types'
+import type { AuthResult } from '@/types'
 
 export const useUserStore = defineStore(
   'user',
@@ -8,27 +8,25 @@ export const useUserStore = defineStore(
     const token = ref('')
     const nickname = ref('')
     const avatar = ref('')
-    const role = ref('')
+    const userId = ref('')
 
     const isLoggedIn = () => !!token.value
 
-    const setLoginInfo = (info: LoginResult) => {
+    const setLoginInfo = (info: AuthResult) => {
       token.value = info.token
       nickname.value = info.nickname
       avatar.value = info.avatar
-      role.value = info.role
+      userId.value = info.userId
     }
 
     const logout = () => {
       token.value = ''
       nickname.value = ''
       avatar.value = ''
-      role.value = ''
+      userId.value = ''
     }
 
-    const hasRole = (requiredRole: string) => role.value === requiredRole
-
-    return { token, nickname, avatar, role, isLoggedIn, setLoginInfo, logout, hasRole }
+    return { token, nickname, avatar, userId, isLoggedIn, setLoginInfo, logout }
   },
   {
     persist: true,

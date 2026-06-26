@@ -7,48 +7,72 @@ const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'Login',
     component: () => import('@/views/Login.vue'),
-    meta: { title: '登录' },
+    meta: { title: '登录', showTabBar: false },
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('@/views/Register.vue'),
+    meta: { title: '注册', showTabBar: false },
   },
   {
     path: '/',
     component: () => import('@/components/Layout.vue'),
-    redirect: '/dashboard',
+    redirect: '/home',
     children: [
       {
-        path: 'dashboard',
-        name: 'Dashboard',
-        component: () => import('@/views/Dashboard.vue'),
-        meta: { title: '仪表盘', icon: 'Odometer', requiresAuth: true },
-      },
-      {
-        path: 'members',
-        name: 'MemberList',
-        component: () => import('@/views/MemberList.vue'),
-        meta: { title: '会员管理', icon: 'User', requiresAuth: true },
-      },
-      {
-        path: 'coaches',
-        name: 'CoachList',
-        component: () => import('@/views/CoachList.vue'),
-        meta: { title: '教练管理', icon: 'Avatar', requiresAuth: true },
+        path: 'home',
+        name: 'Home',
+        component: () => import('@/views/Home.vue'),
+        meta: { title: '首页', showTabBar: true, requiresAuth: true },
       },
       {
         path: 'courses',
-        name: 'CourseList',
-        component: () => import('@/views/CourseList.vue'),
-        meta: { title: '课程管理', icon: 'Calendar', requiresAuth: true },
+        name: 'CourseBrowse',
+        component: () => import('@/views/CourseBrowse.vue'),
+        meta: { title: '课程', showTabBar: true },
       },
       {
-        path: 'checkins',
-        name: 'CheckinList',
-        component: () => import('@/views/CheckinList.vue'),
-        meta: { title: '签到记录', icon: 'Check', requiresAuth: true },
+        path: 'courses/:id',
+        name: 'CourseDetail',
+        component: () => import('@/views/CourseDetail.vue'),
+        meta: { title: '课程详情', showTabBar: false },
+      },
+      {
+        path: 'coaches',
+        name: 'CoachBrowse',
+        component: () => import('@/views/CoachBrowse.vue'),
+        meta: { title: '教练', showTabBar: true },
+      },
+      {
+        path: 'coaches/:id',
+        name: 'CoachDetail',
+        component: () => import('@/views/CoachDetail.vue'),
+        meta: { title: '教练详情', showTabBar: false },
       },
       {
         path: 'ai-chat',
         name: 'AiChat',
         component: () => import('@/views/AiChat.vue'),
-        meta: { title: 'AI 助手', icon: 'ChatDotRound', requiresAuth: true },
+        meta: { title: 'AI助手', showTabBar: true, requiresAuth: true },
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/Profile.vue'),
+        meta: { title: '我的', showTabBar: true, requiresAuth: true },
+      },
+      {
+        path: 'my-courses',
+        name: 'MyCourses',
+        component: () => import('@/views/MyCourses.vue'),
+        meta: { title: '我的课程', showTabBar: false, requiresAuth: true },
+      },
+      {
+        path: 'my-checkins',
+        name: 'MyCheckins',
+        component: () => import('@/views/MyCheckins.vue'),
+        meta: { title: '签到记录', showTabBar: false, requiresAuth: true },
       },
     ],
   },
@@ -59,16 +83,15 @@ const router = createRouter({
   routes,
 })
 
-// 路由守卫
 router.beforeEach((to, _from, next) => {
-  document.title = `${to.meta.title || 'gymAI'} - 智能健身房管理系统`
+  document.title = `${to.meta.title || ''} - gymAI`
 
   const userStore = useUserStore()
 
   if (to.meta.requiresAuth && !userStore.isLoggedIn()) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
   } else if (to.name === 'Login' && userStore.isLoggedIn()) {
-    next({ name: 'Dashboard' })
+    next({ name: 'Home' })
   } else {
     next()
   }

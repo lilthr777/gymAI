@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymai.common.Result;
 import com.gymai.entity.Checkin;
 
-import java.util.Map;
-
 public interface CheckinService {
-    Result<Page<Checkin>> page(int pageNum, int pageSize, Long memberId, Long courseId);
-    Result<?> checkin(Checkin checkin);
-    Result<Map<String, Object>> stats();
+    Result<?> checkin(Long userId, Long courseId);
+    Result<Page<Checkin>> myCheckins(Long userId, int pageNum, int pageSize);
 }

@@ -26,20 +26,4 @@ public class CoachController {
     public Result<Coach> getById(@PathVariable Long id) {
         return coachService.getById(id);
     }
-
-    @PostMapping
-    public Result<?> save(@RequestBody Coach coach) {
-        return coachService.save(coach);
-    }
-
-    @PutMapping("/{id}")
-    public Result<?> update(@PathVariable Long id, @RequestBody Coach coach) {
-        coach.setId(id);
-        return coachService.update(coach);
-    }
-
-    @DeleteMapping("/{id}")
-    public Result<?> delete(@PathVariable Long id) {
-        return coachService.delete(id);
-    }
 }
