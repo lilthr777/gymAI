@@ -20,6 +20,8 @@ public class Course {
     private Integer currentCount;
     private String description;
     private Integer status;
+    @TableField(exist = false)
+    private String coachName;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
     @TableField(fill = FieldFill.INSERT_UPDATE)

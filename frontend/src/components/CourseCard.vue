@@ -6,7 +6,11 @@
     </div>
     <div class="card-body">
       <div class="card-name">{{ course.name }}</div>
-      <div class="card-meta">{{ course.currentCount }}/{{ course.maxCapacity }}人</div>
+      <div class="card-meta">
+        <span v-if="course.coachName">{{ course.coachName }}</span>
+        <span v-if="course.coachName" class="meta-sep">|</span>
+        <span>{{ course.currentCount }}/{{ course.maxCapacity }}人</span>
+      </div>
     </div>
     <div class="card-right">
       <el-tag :type="tagType" size="small">{{ tagText }}</el-tag>
@@ -85,6 +89,11 @@ const tagType = computed(() => {
 .card-meta {
   font-size: 12px;
   color: $color-lead;
+
+  .meta-sep {
+    margin: 0 4px;
+    opacity: 0.5;
+  }
 }
 
 html.dark {

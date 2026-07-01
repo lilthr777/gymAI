@@ -21,6 +21,10 @@
         <span class="info-label">人数</span>
         <span class="info-value">{{ course.currentCount }} / {{ course.maxCapacity }} 人</span>
       </div>
+      <div class="info-row" v-if="course.coachName">
+        <span class="info-label">教练</span>
+        <span class="info-value">{{ course.coachName }}</span>
+      </div>
       <div class="info-row">
         <span class="info-label">描述</span>
         <span class="info-value">{{ course.description || '暂无描述' }}</span>

@@ -3,8 +3,10 @@ package com.gymai.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymai.common.Result;
+import com.gymai.entity.Coach;
 import com.gymai.entity.Course;
 import com.gymai.entity.UserCourse;
+import com.gymai.mapper.CoachMapper;
 import com.gymai.mapper.CourseMapper;
 import com.gymai.mapper.UserCourseMapper;
 import com.gymai.service.CourseService;
@@ -13,12 +15,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
     private final CourseMapper courseMapper;
     private final UserCourseMapper userCourseMapper;
+    private final CoachMapper coachMapper;
+
+    /** 给课程列表批量填充教练名 */
+    private void fillCoachNames(List<Course> courses) {
+        if (courses == null || courses.isEmpty()) return;
+        List<Long> coachIds = courses.stream()
+                .map(Course::getCoachId)
+                .filter(id -> id != null)
+                .distinct()
+                .toList();
+        if (coachIds.isEmpty()) return;
+        Map<Long, String> nameMap = coachMapper.selectBatchIds(coachIds).stream()
+                .collect(Collectors.toMap(Coach::getId, Coach::getName));
+        courses.forEach(c -> {
+            if (c.getCoachId() != null) c.setCoachName(nameMap.get(c.getCoachId()));
+        });
+    }
 
     @Override
     public Result<Page<Course>> page(int pageNum, int pageSize, String keyword, Long coachId) {
@@ -33,12 +56,15 @@ public class CourseServiceImpl implements CourseService {
         }
         wrapper.orderByAsc(Course::getCourseDate).orderByAsc(Course::getStartTime);
         courseMapper.selectPage(page, wrapper);
+        fillCoachNames(page.getRecords());
         return Result.ok(page);
     }
 
     @Override
     public Result<Course> getById(Long id) {
-        return Result.ok(courseMapper.selectById(id));
+        Course course = courseMapper.selectById(id);
+        if (course != null) fillCoachNames(List.of(course));
+        return Result.ok(course);
     }
 
     @Override
@@ -101,9 +127,11 @@ public class CourseServiceImpl implements CourseService {
         userCourseMapper.selectPage(ucPage, wrapper);
 
         Page<Course> result = new Page<>(pageNum, pageSize, ucPage.getTotal());
-        result.setRecords(ucPage.getRecords().stream()
+        List<Course> records = ucPage.getRecords().stream()
                 .map(uc -> courseMapper.selectById(uc.getCourseId()))
-                .toList());
+                .toList();
+        fillCoachNames(records);
+        result.setRecords(records);
         return Result.ok(result);
     }
 }

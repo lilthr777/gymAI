@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/home")
@@ -49,7 +50,19 @@ public class HomeController {
                 .ge(Course::getCourseDate, LocalDate.now())
                 .orderByAsc(Course::getCourseDate).orderByAsc(Course::getStartTime);
         courseMapper.selectPage(coursePage, courseWrapper);
+        fillCoachNames(coursePage.getRecords());
         data.put("upcomingCourses", coursePage.getRecords());
+
+        // 用户已报名的课程
+        List<UserCourse> myCourses = userCourseMapper.selectList(
+                new LambdaQueryWrapper<UserCourse>().eq(UserCourse::getUserId, userId));
+        List<Course> myCourseList = new ArrayList<>();
+        if (!myCourses.isEmpty()) {
+            myCourseList = courseMapper.selectBatchIds(
+                    myCourses.stream().map(UserCourse::getCourseId).toList());
+            fillCoachNames(myCourseList);
+        }
+        data.put("myCourses", myCourseList);
 
         // 推荐教练（在职的前5位）
         Page<Coach> coachPage = new Page<>(1, 5);
@@ -60,5 +73,17 @@ public class HomeController {
         data.put("coaches", coachPage.getRecords());
 
         return Result.ok(data);
+    }
+
+    private void fillCoachNames(List<Course> courses) {
+        if (courses == null || courses.isEmpty()) return;
+        List<Long> coachIds = courses.stream()
+                .map(Course::getCoachId).filter(id -> id != null).distinct().toList();
+        if (coachIds.isEmpty()) return;
+        Map<Long, String> nameMap = coachMapper.selectBatchIds(coachIds).stream()
+                .collect(Collectors.toMap(Coach::getId, Coach::getName));
+        courses.forEach(c -> {
+            if (c.getCoachId() != null) c.setCoachName(nameMap.get(c.getCoachId()));
+        });
     }
 }
