@@ -5,17 +5,14 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("checkin")
-public class Checkin {
+@TableName("card_order")
+public class CardOrder {
     @TableId(type = IdType.AUTO)
     private Long id;
     private Long userId;
-    private Long courseId;
-    private LocalDateTime checkinTime;
+    private String cardType;
+    private Integer amount;
     private Integer status;
-    private String remark;
-    @TableField(exist = false)
-    private String courseName;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 }

@@ -29,41 +29,30 @@
         <span class="info-label">描述</span>
         <span class="info-value">{{ course.description || '暂无描述' }}</span>
       </div>
+      <!-- 签到反馈 -->
+      <div v-if="checkinTime" class="info-row checkin-row">
+        <span class="info-label">签到</span>
+        <span class="info-value checkin-ok">已签到 {{ checkinTime }}</span>
+      </div>
     </div>
 
     <div v-if="userStore.isLoggedIn()" class="detail-actions">
       <template v-if="registered">
-        <div class="action-row">
-          <el-button
-            v-if="!checkedIn"
-            type="success"
-            size="large"
-            :loading="checkingIn"
-            class="action-btn"
-            @click="handleCheckin"
-          >
+        <template v-if="!checkedIn">
+          <el-button type="success" size="large" :loading="checkingIn" class="action-btn" @click="handleCheckin">
             签到
           </el-button>
-          <el-tag v-if="checkedIn" type="success" size="large" class="checked-in-badge">已签到</el-tag>
-          <el-button
-            type="danger"
-            size="large"
-            :loading="canceling"
-            class="action-btn cancel-btn"
-            @click="handleCancel"
-          >
+          <el-button type="danger" plain size="large" :loading="canceling" class="action-btn ghost-btn" @click="handleCancel">
             取消报名
           </el-button>
+        </template>
+        <div v-else class="done-box">
+          <el-icon :size="18"><CircleCheckFilled /></el-icon>
+          <span>已签到</span>
+          <span v-if="checkinTime" class="done-time">{{ checkinTime }}</span>
         </div>
       </template>
-      <el-button
-        v-else-if="canRegister"
-        type="primary"
-        size="large"
-        :loading="registering"
-        class="action-btn"
-        @click="handleRegister"
-      >
+      <el-button v-else-if="canRegister" type="primary" size="large" :loading="registering" class="action-btn" @click="handleRegister">
         立即报名
       </el-button>
     </div>
@@ -77,8 +66,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { ArrowLeft } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { ArrowLeft, CircleCheckFilled } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { courseApi, checkinApi } from '@/api'
 import type { Course } from '@/types'
@@ -88,192 +77,112 @@ const userStore = useUserStore()
 const course = ref<Course | null>(null)
 const registered = ref(false)
 const checkedIn = ref(false)
+const checkinTime = ref('')
 const registering = ref(false)
 const checkingIn = ref(false)
 const canceling = ref(false)
 
-const canRegister = computed(() => {
-  if (!course.value) return false
-  return course.value.status === 1 && !registered.value
-})
+const canRegister = computed(() => course.value?.status === 1 && !registered.value)
 
 const statusText = computed(() => {
   if (course.value?.status === 0) return '已取消'
   if (course.value?.status === 2 || (course.value && course.value.currentCount >= course.value.maxCapacity)) return '已满员'
+  if (registered.value) return '已报名'
   return '可报名'
 })
-
 const statusTagType = computed(() => {
   if (course.value?.status === 0) return 'danger'
   if (course.value?.status === 2) return 'warning'
+  if (registered.value) return ''
   return 'success'
 })
 
 const handleRegister = async () => {
-  if (!course.value?.id) return
+  if (!course.value?.id || registering.value) return
   registering.value = true
   try {
     await courseApi.register(course.value.id)
     registered.value = true
     if (course.value) course.value.currentCount++
     ElMessage.success('报名成功')
-  } catch {
-    // handled
-  } finally {
-    registering.value = false
-  }
+  } catch { /* handled */ }
+  finally { registering.value = false }
 }
 
 const handleCheckin = async () => {
-  if (!course.value?.id) return
+  if (!course.value?.id || checkingIn.value) return
   checkingIn.value = true
   try {
     await checkinApi.checkin(course.value.id)
     checkedIn.value = true
+    const now = new Date()
+    checkinTime.value = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
     ElMessage.success('签到成功')
-  } catch {
-    // handled
-  } finally {
-    checkingIn.value = false
-  }
+  } catch { /* handled */ }
+  finally { checkingIn.value = false }
 }
 
 const handleCancel = async () => {
-  if (!course.value?.id) return
+  if (!course.value?.id || canceling.value) return
   canceling.value = true
   try {
     await courseApi.cancel(course.value.id)
     registered.value = false
     checkedIn.value = false
-    if (course.value) course.value.currentCount--
-    course.value.registered = false
+    checkinTime.value = ''
+    if (course.value) {
+      course.value.currentCount--
+      course.value.registered = false
+    }
     ElMessage.success('已取消报名')
-  } catch {
-    // handled
-  } finally {
-    canceling.value = false
-  }
+  } catch { /* handled */ }
+  finally { canceling.value = false }
 }
 
 onMounted(async () => {
-  const id = Number(route.params.id)
   try {
-    const res = await courseApi.getById(id)
+    const res = await courseApi.getById(Number(route.params.id))
     course.value = res.data
     registered.value = !!res.data.registered
-  } catch {
-    // handled
-  }
+  } catch { /* handled */ }
 })
 </script>
 
 <style scoped lang="scss">
-.course-detail {
-  padding: 16px;
+.course-detail { padding: 16px; }
+.page-nav { margin-bottom: 12px; }
+
+.detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
+  h2 { font-size: 22px; font-weight: 600; color: $color-carbon; margin: 0; }
 }
 
-.page-nav {
-  margin-bottom: 12px;
+.detail-info { background: $color-sheet; border-radius: $radius-lg; padding: 16px; margin-bottom: 24px; }
+
+.info-row { display: flex; padding: 10px 0; border-bottom: 1px solid $color-steel;
+  &:last-child { border-bottom: none; }
+}
+.info-label { width: 56px; font-size: 14px; color: $color-lead; flex-shrink: 0; }
+.info-value { font-size: 14px; color: $color-carbon; }
+
+.checkin-row { border-bottom: none; }
+.checkin-ok { color: $color-cobalt; font-weight: 500; }
+
+.detail-actions { padding: 0 8px; display: flex; flex-direction: column; gap: 10px; }
+
+.action-btn { width: 100%; height: 48px; font-size: 16px; font-weight: 500; }
+.ghost-btn { margin-left: 0 !important; }
+
+.done-box { display: flex; align-items: center; gap: 8px; padding: 12px 0; color: $color-cobalt; font-size: $font-size-base; font-weight: 500;
+  .done-time { color: $color-lead; font-weight: 400; font-size: $font-size-sm; }
 }
 
-.detail-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-
-  h2 {
-    font-size: 22px;
-    font-weight: 600;
-    color: $color-carbon;
-    margin: 0;
-  }
-}
-
-.detail-info {
-  background: $color-sheet;
-  border-radius: $radius-lg;
-  padding: 16px;
-  margin-bottom: 24px;
-}
-
-.info-row {
-  display: flex;
-  padding: 10px 0;
-  border-bottom: 1px solid $color-steel;
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.info-label {
-  width: 56px;
-  font-size: 14px;
-  color: $color-lead;
-  flex-shrink: 0;
-}
-
-.info-value {
-  font-size: 14px;
-  color: $color-carbon;
-}
-
-.detail-actions {
-  padding: 0 8px;
-}
-
-.action-row {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.action-btn {
-  width: 100%;
-  height: 48px;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.cancel-btn {
-  margin-left: 0 !important;
-}
-
-.checked-in-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-  font-size: 15px;
-  width: 100%;
-}
-
-.login-hint {
-  text-align: center;
-  padding: 24px;
-  font-size: 14px;
-  color: $color-lead;
-
-  a {
-    color: $color-cobalt;
-    font-weight: 500;
-  }
+.login-hint { text-align: center; padding: 24px; font-size: 14px; color: $color-lead;
+  a { color: $color-cobalt; font-weight: 500; }
 }
 
 html.dark {
-  .detail-header h2,
-  .info-value {
-    color: $dark-text;
-  }
-
-  .detail-info {
-    background: $dark-bg-card;
-    border-color: $dark-border;
-  }
-
-  .info-row {
-    border-bottom-color: $dark-border;
-  }
+  .detail-header h2, .info-value { color: $dark-text; }
+  .detail-info { background: $dark-bg-card; border-color: $dark-border; }
+  .info-row { border-bottom-color: $dark-border; }
 }
 </style>

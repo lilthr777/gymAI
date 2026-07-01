@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomeController {
 
+    private final UserMapper userMapper;
     private final UserCourseMapper userCourseMapper;
     private final CheckinMapper checkinMapper;
     private final CourseMapper courseMapper;
@@ -43,20 +44,24 @@ public class HomeController {
                         .ge(Checkin::getCheckinTime, LocalDate.now().withDayOfMonth(1).atStartOfDay()));
         data.put("monthCheckins", monthCheckins);
 
-        // 推荐课程（最近的5条）
+        // 用户已报名的课程 ID（用于后续排除）
+        List<UserCourse> myCourses = userCourseMapper.selectList(
+                new LambdaQueryWrapper<UserCourse>().eq(UserCourse::getUserId, userId));
+        List<Long> myCourseIds = myCourses.stream().map(UserCourse::getCourseId).toList();
+
+        // 推荐课程（排除已报名的）
         Page<Course> coursePage = new Page<>(1, 5);
         LambdaQueryWrapper<Course> courseWrapper = new LambdaQueryWrapper<Course>()
                 .eq(Course::getStatus, 1)
                 .ge(Course::getCourseDate, LocalDate.now())
                 .orderByAsc(Course::getCourseDate).orderByAsc(Course::getStartTime);
+        if (!myCourseIds.isEmpty()) {
+            courseWrapper.notIn(Course::getId, myCourseIds);
+        }
         courseMapper.selectPage(coursePage, courseWrapper);
         fillCoachNames(coursePage.getRecords());
         markUserRegistered(coursePage.getRecords(), userId);
         data.put("upcomingCourses", coursePage.getRecords());
-
-        // 用户已报名的课程
-        List<UserCourse> myCourses = userCourseMapper.selectList(
-                new LambdaQueryWrapper<UserCourse>().eq(UserCourse::getUserId, userId));
         List<Course> myCourseList = new ArrayList<>();
         if (!myCourses.isEmpty()) {
             myCourseList = courseMapper.selectBatchIds(
@@ -74,6 +79,14 @@ public class HomeController {
                 .orderByDesc(Coach::getCreatedAt);
         coachMapper.selectPage(coachPage, coachWrapper);
         data.put("coaches", coachPage.getRecords());
+
+        // 会员卡信息
+        User user = userMapper.selectById(userId);
+        Map<String, Object> card = new HashMap<>();
+        card.put("cardType", user.getCardType());
+        card.put("cardStartDate", user.getCardStartDate());
+        card.put("cardEndDate", user.getCardEndDate());
+        data.put("card", card);
 
         return Result.ok(data);
     }

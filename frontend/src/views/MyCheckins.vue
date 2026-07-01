@@ -9,14 +9,18 @@
       <div v-for="item in list" :key="item.id" class="checkin-item">
         <div class="checkin-left">
           <div class="checkin-time">{{ item.checkinTime?.slice(0, 16)?.replace('T', ' ') }}</div>
-          <div class="checkin-course">课程 #{{ item.courseId }}</div>
+          <div class="checkin-course">{{ item.courseName || '课程 #' + item.courseId }}</div>
         </div>
         <el-tag :type="item.status === 1 ? 'success' : item.status === 2 ? 'warning' : 'info'" size="small">
           {{ item.status === 1 ? '已签到' : item.status === 2 ? '迟到' : '缺席' }}
         </el-tag>
       </div>
     </div>
-    <el-empty v-else description="暂无签到记录" />
+    <div v-else class="empty-box">
+      <span class="empty-emoji">📊</span>
+      <p>还没有签到记录</p>
+      <router-link to="/courses" class="empty-link">去约一节课吧</router-link>
+    </div>
 
     <div v-if="total > list.length" class="load-more">
       <el-button :loading="loading" @click="loadMore">加载更多</el-button>
@@ -97,6 +101,14 @@ onMounted(() => fetchList())
 .load-more {
   text-align: center;
   padding: 16px;
+}
+
+.empty-box { text-align: center; padding: 40px 0; color: $color-lead;
+  .empty-emoji { font-size: 40px; display: block; margin-bottom: 12px; }
+  p { font-size: $font-size-sm; margin-bottom: 8px; }
+}
+.empty-link { font-size: $font-size-sm; color: $color-cobalt; text-decoration: none; font-weight: 500;
+  &:hover { text-decoration: underline; }
 }
 
 html.dark {

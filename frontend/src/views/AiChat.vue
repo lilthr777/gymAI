@@ -128,12 +128,15 @@ const messageListRef = ref<HTMLDivElement>()
 let typewriterTimer: ReturnType<typeof setInterval> | null = null
 let abortController: AbortController | null = null
 
-const quickPrompts = [
-  '帮我推荐适合减脂的课程',
-  '这周有什么瑜伽课？',
-  '我报了哪些课程？',
-  '本月签到几次了？',
-]
+const quickPrompts = computed(() => {
+  if (!userStore.isLoggedIn()) return ['有什么课程？', '有哪些教练？']
+  const base = ['帮我推荐今天的课程', '这周有什么瑜伽课？', '我报了哪些课程？']
+  const h = new Date().getHours()
+  if (h < 10) base.unshift('早上适合做什么训练？')
+  else if (h < 17) base.unshift('下午有什么课程？')
+  else base.unshift('晚上有课吗？')
+  return base.slice(0, 4)
+})
 
 const scrollToBottom = async () => {
   await nextTick()

@@ -14,6 +14,10 @@
         <span>签到记录</span>
         <el-icon><ArrowRight /></el-icon>
       </div>
+      <div class="menu-item" @click="$router.push('/card')">
+        <span>会员卡</span>
+        <el-icon><ArrowRight /></el-icon>
+      </div>
     </div>
 
     <div class="section-title">基本信息</div>

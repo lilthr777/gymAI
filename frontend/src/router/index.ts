@@ -74,6 +74,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/MyCheckins.vue'),
         meta: { title: '签到记录', showTabBar: false, requiresAuth: true },
       },
+      {
+        path: 'card',
+        name: 'CardPage',
+        component: () => import('@/views/CardPage.vue'),
+        meta: { title: '会员卡', showTabBar: false, requiresAuth: true },
+      },
     ],
   },
 ]

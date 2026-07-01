@@ -43,6 +43,12 @@ export const checkinApi = {
     request.get<any, ApiResponse<PageResult<Checkin>>>('/api/checkins/my', { params }),
 }
 
+// 会员卡
+export const cardApi = {
+  info: () => request.get<any, ApiResponse<any>>('/api/card'),
+  renew: (cardType: string) => request.post<any, ApiResponse<any>>('/api/card/renew', { cardType }),
+}
+
 // AI 聊天
 export const aiChatApi = {
   chat: (message: string, signal?: AbortSignal) =>

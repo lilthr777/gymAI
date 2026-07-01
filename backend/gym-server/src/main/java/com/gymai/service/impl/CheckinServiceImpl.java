@@ -4,14 +4,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymai.common.Result;
 import com.gymai.entity.Checkin;
+import com.gymai.entity.Course;
 import com.gymai.entity.UserCourse;
 import com.gymai.mapper.CheckinMapper;
+import com.gymai.mapper.CourseMapper;
 import com.gymai.mapper.UserCourseMapper;
 import com.gymai.service.CheckinService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ public class CheckinServiceImpl implements CheckinService {
 
     private final CheckinMapper checkinMapper;
     private final UserCourseMapper userCourseMapper;
+    private final CourseMapper courseMapper;
 
     @Override
     public Result<?> checkin(Long userId, Long courseId) {
@@ -52,6 +57,13 @@ public class CheckinServiceImpl implements CheckinService {
                 .eq(Checkin::getUserId, userId)
                 .orderByDesc(Checkin::getCheckinTime);
         checkinMapper.selectPage(page, wrapper);
+        // 填充课程名
+        List<Long> courseIds = page.getRecords().stream().map(Checkin::getCourseId).distinct().toList();
+        if (!courseIds.isEmpty()) {
+            Map<Long, String> nameMap = courseMapper.selectBatchIds(courseIds).stream()
+                    .collect(Collectors.toMap(Course::getId, Course::getName));
+            page.getRecords().forEach(c -> c.setCourseName(nameMap.get(c.getCourseId())));
+        }
         return Result.ok(page);
     }
 }

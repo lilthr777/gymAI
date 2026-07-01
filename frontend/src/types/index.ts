@@ -70,11 +70,19 @@ export interface Checkin {
 }
 
 // 首页数据
+export interface CardInfo {
+  cardType?: string
+  cardStartDate?: string
+  cardEndDate?: string
+}
+
 export interface HomeData {
   myCourseCount: number
   monthCheckins: number
+  myCourses: Course[]
   upcomingCourses: Course[]
   coaches: Coach[]
+  card?: CardInfo
 }
 
 // 登录表单
