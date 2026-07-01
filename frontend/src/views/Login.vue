@@ -1,36 +1,16 @@
 <template>
   <div class="login-page">
-    <!-- Brand Side -->
+    <!-- Brand Header -->
     <div class="login-brand">
-      <div class="brand-inner">
-        <h1 class="brand-logo">gymAI</h1>
-        <p class="brand-tagline">你的专属健身伙伴</p>
-        <div class="brand-features">
-          <div class="feature-item">
-            <span class="feature-dot"></span>
-            <span>海量精品健身课程</span>
-          </div>
-          <div class="feature-item">
-            <span class="feature-dot"></span>
-            <span>专业教练团队</span>
-          </div>
-          <div class="feature-item">
-            <span class="feature-dot"></span>
-            <span>一键预约 轻松签到</span>
-          </div>
-          <div class="feature-item">
-            <span class="feature-dot"></span>
-            <span>AI 健身助手随时陪伴</span>
-          </div>
-        </div>
-      </div>
+      <h1 class="brand-logo">gymAI</h1>
+      <p class="brand-tagline">你的专属健身伙伴</p>
     </div>
 
-    <!-- Form Side -->
+    <!-- Form -->
     <div class="login-form-side">
       <div class="form-card">
         <h2 class="form-title">登录</h2>
-        <p class="form-desc">输入账号密码进入管理系统</p>
+        <p class="form-desc">登录你的健身账户</p>
 
         <el-form
           ref="formRef"
@@ -55,6 +35,11 @@
               show-password
             />
           </el-form-item>
+          <!-- 记住密码 & 忘记密码 -->
+          <div class="form-extra">
+            <el-checkbox v-model="rememberMe" size="small">记住密码</el-checkbox>
+            <span class="forgot-link" @click="handleForgot">忘记密码？</span>
+          </div>
           <el-form-item>
             <el-button
               type="primary"
@@ -66,6 +51,15 @@
             </el-button>
           </el-form-item>
         </el-form>
+
+        <!-- 第三方登录占位 -->
+        <div class="social-login">
+          <div class="social-divider"><span>其他方式登录</span></div>
+          <div class="social-icons">
+            <span class="social-btn" title="微信登录"><el-icon :size="20"><ChatDotSquare /></el-icon></span>
+            <span class="social-btn" title="手机验证码登录"><el-icon :size="20"><Iphone /></el-icon></span>
+          </div>
+        </div>
 
         <p class="form-hint">
           还没有账号？<router-link to="/register" class="register-link">立即注册</router-link>
@@ -79,7 +73,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { User, Lock } from '@element-plus/icons-vue'
+import { User, Lock, ChatDotSquare, Iphone } from '@element-plus/icons-vue'
 import { authApi } from '@/api'
 import { useUserStore } from '@/stores/user'
 import type { LoginForm } from '@/types'
@@ -90,11 +84,23 @@ const userStore = useUserStore()
 
 const formRef = ref<FormInstance>()
 const loading = ref(false)
+const rememberMe = ref(false)
 
 const form = reactive<LoginForm>({
   username: '',
   password: '',
 })
+
+// 记住密码：从 localStorage 恢复
+const saved = localStorage.getItem('gymai_remember')
+if (saved) {
+  try {
+    const u = JSON.parse(saved)
+    form.username = u.username || ''
+    form.password = u.password || ''
+    rememberMe.value = true
+  } catch { /* ignore */ }
+}
 
 const rules: FormRules = {
   username: [
@@ -107,6 +113,10 @@ const rules: FormRules = {
   ],
 }
 
+const handleForgot = () => {
+  ElMessage.info('请联系管理员重置密码，或重新注册账号')
+}
+
 const handleLogin = async () => {
   if (!formRef.value) return
   await formRef.value.validate(async (valid) => {
@@ -115,6 +125,12 @@ const handleLogin = async () => {
     try {
       const res = await authApi.login(form)
       userStore.setLoginInfo(res.data)
+      // 记住密码
+      if (rememberMe.value) {
+        localStorage.setItem('gymai_remember', JSON.stringify({ username: form.username, password: form.password }))
+      } else {
+        localStorage.removeItem('gymai_remember')
+      }
       ElMessage.success('登录成功')
       const redirect = (route.query.redirect as string) || '/home'
       router.push(redirect)
@@ -129,93 +145,47 @@ const handleLogin = async () => {
 
 <style scoped lang="scss">
 .login-page {
+  min-height: 100vh;
   display: flex;
-  height: 100vh;
-  overflow: hidden;
-}
-
-// ── Brand Side ───────────────────────────────
-.login-brand {
-  flex: 1;
-  background: $color-carbon;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-
-  // Subtle radial glow in top-right
-  &::after {
-    content: '';
-    position: absolute;
-    top: -30%;
-    right: -20%;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(59, 110, 176, 0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
+  background: $color-sheet;
 }
 
-.brand-inner {
-  position: relative;
-  z-index: 1;
-  padding: 48px;
-  max-width: 420px;
+// ── Brand Header ──────────────────────────────
+.login-brand {
+  width: 100%;
+  text-align: center;
+  padding: 64px 24px 48px;
+  background: linear-gradient(180deg, $color-carbon 0%, #343840 100%);
 }
 
 .brand-logo {
   font-family: $font-display;
-  font-size: 52px;
+  font-size: 42px;
   font-weight: 600;
   letter-spacing: 0.06em;
   color: $color-sheet;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .brand-tagline {
-  font-size: 17px;
-  color: #8B8F94;
-  margin-bottom: 48px;
-  font-weight: 400;
+  font-size: $font-size-base;
+  color: #9B9EA3;
 }
 
-.brand-features {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: #A0A4A9;
-  font-size: 15px;
-}
-
-.feature-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: $color-cobalt;
-  flex-shrink: 0;
-}
-
-// ── Form Side ────────────────────────────────
+// ── Form Section ──────────────────────────────
 .login-form-side {
-  width: 460px;
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 48px;
-  background: $color-sheet;
+  padding: 32px 24px 48px;
+  flex: 1;
 }
 
 .form-card {
   width: 100%;
-  max-width: 360px;
+  max-width: 380px;
 }
 
 .form-title {
@@ -238,6 +208,20 @@ const handleLogin = async () => {
   font-weight: 500;
 }
 
+.form-extra { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.forgot-link { font-size: $font-size-sm; color: $color-lead; cursor: pointer; &:hover { color: $color-cobalt; } }
+
+// ── Social Login ─────────────────────────────
+.social-login { text-align: center; margin: 24px 0 16px; }
+.social-divider { display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+  &::before, &::after { content: ''; flex: 1; height: 1px; background: $color-steel; }
+  span { font-size: $font-size-sm; color: $color-lead; white-space: nowrap; }
+}
+.social-icons { display: flex; justify-content: center; gap: 20px; }
+.social-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid $color-steel; border-radius: 50%; cursor: pointer; color: $color-lead; transition: all $transition-fast;
+  &:hover { border-color: $color-cobalt; color: $color-cobalt; }
+}
+
 .form-hint {
   text-align: center;
   color: #B0B4BA;
@@ -254,15 +238,9 @@ const handleLogin = async () => {
   }
 }
 
-// ── Responsive ───────────────────────────────
-@media (max-width: 768px) {
-  .login-brand {
-    display: none;
-  }
-
-  .login-form-side {
-    width: 100%;
-    padding: 32px;
-  }
+@media (max-width: 480px) {
+  .login-brand { padding: 36px 16px 28px; }
+  .brand-logo { font-size: 34px; }
+  .login-form-side { padding: 24px 16px 40px; }
 }
 </style>

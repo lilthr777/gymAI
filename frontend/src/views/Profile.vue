@@ -6,6 +6,11 @@
     </div>
 
     <div class="menu-list">
+      <div class="menu-item" @click="$router.push('/edit-profile')">
+        <span>编辑资料</span>
+        <span class="menu-extra">{{ profile.nickname }}</span>
+        <el-icon><ArrowRight /></el-icon>
+      </div>
       <div class="menu-item" @click="$router.push('/my-courses')">
         <span>我的课程</span>
         <el-icon><ArrowRight /></el-icon>
@@ -16,37 +21,9 @@
       </div>
       <div class="menu-item" @click="$router.push('/card')">
         <span>会员卡</span>
+        <span class="menu-extra">{{ profile.cardType ? cardLabel : '未开通' }}</span>
         <el-icon><ArrowRight /></el-icon>
       </div>
-    </div>
-
-    <div class="section-title">基本信息</div>
-    <el-form ref="formRef" :model="profile" label-width="64px" class="profile-form">
-      <el-form-item label="用户名">
-        <el-input :model-value="profile.username" disabled />
-      </el-form-item>
-      <el-form-item label="昵称">
-        <el-input v-model="profile.nickname" />
-      </el-form-item>
-      <el-form-item label="手机号">
-        <el-input v-model="profile.phone" disabled />
-      </el-form-item>
-      <el-form-item label="性别">
-        <el-radio-group v-model="profile.gender">
-          <el-radio :value="1">男</el-radio>
-          <el-radio :value="2">女</el-radio>
-          <el-radio :value="0">未知</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" :loading="saving" class="save-btn" @click="handleSave">保存</el-button>
-      </el-form-item>
-    </el-form>
-
-    <div class="section-title">会员卡</div>
-    <div class="card-info">
-      <el-tag :type="cardTypeTag">{{ profile.cardType || '暂无' }}</el-tag>
-      <span v-if="profile.cardEndDate" class="card-date">有效期至 {{ profile.cardEndDate }}</span>
     </div>
 
     <div class="logout-area">
@@ -58,7 +35,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { userApi } from '@/api'
@@ -66,54 +42,20 @@ import type { User } from '@/types'
 
 const router = useRouter()
 const userStore = useUserStore()
-const saving = ref(false)
 
 const profile = reactive<User>({
-  username: '',
-  phone: '',
-  nickname: '',
-  avatar: '',
-  gender: 0,
-  status: 1,
+  username: '', phone: '', nickname: '', avatar: '', gender: 0, status: 1,
 })
 
-const cardTypeTag = computed(() => {
-  const map: Record<string, string> = {
-    MONTH: 'success', QUARTER: 'primary', YEAR: 'warning', LIFETIME: 'danger',
-  }
-  return map[profile.cardType || ''] || 'info'
+const cardLabel = computed(() => {
+  const map: Record<string, string> = { MONTH: '月卡', QUARTER: '季卡', YEAR: '年卡', LIFETIME: '终身卡' }
+  return map[profile.cardType || ''] || ''
 })
 
-const handleSave = async () => {
-  saving.value = true
-  try {
-    await userApi.updateProfile({
-      nickname: profile.nickname,
-      phone: profile.phone,
-      gender: profile.gender,
-      avatar: profile.avatar,
-    })
-    userStore.nickname = profile.nickname
-    ElMessage.success('保存成功')
-  } catch {
-    // handled
-  } finally {
-    saving.value = false
-  }
-}
-
-const handleLogout = () => {
-  userStore.logout()
-  router.push('/login')
-}
+const handleLogout = () => { userStore.logout(); router.push('/login') }
 
 onMounted(async () => {
-  try {
-    const res = await userApi.getProfile()
-    Object.assign(profile, res.data)
-  } catch {
-    // handled
-  }
+  try { const res = await userApi.getProfile(); Object.assign(profile, res.data) } catch { /* handled */ }
 })
 </script>
 
@@ -144,76 +86,21 @@ onMounted(async () => {
 }
 
 .menu-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px;
-  cursor: pointer;
-  border-bottom: 1px solid $color-steel;
-  font-size: 14px;
-  color: $color-carbon;
-
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 16px; cursor: pointer;
+  border-bottom: 1px solid $color-steel; font-size: 14px; color: $color-carbon;
   &:last-child { border-bottom: none; }
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.02);
-  }
+  &:hover { background: rgba(0, 0, 0, 0.02); }
 }
+.menu-extra { font-size: $font-size-sm; color: $color-lead; flex: 1; text-align: right; margin-right: 12px; }
 
-.section-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: $color-lead;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-}
-
-.profile-form {
-  background: $color-sheet;
-  border-radius: $radius-lg;
-  padding: 16px;
-  margin-bottom: 24px;
-}
-
-.save-btn {
-  width: 100%;
-}
-
-.card-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  margin-bottom: 24px;
-}
-
-.card-date {
-  font-size: 13px;
-  color: $color-lead;
-}
-
-.logout-area {
-  padding: 24px 0;
-  text-align: center;
-}
+.logout-area { padding: 32px 0; text-align: center; }
 
 html.dark {
-  .profile-header h2 {
-    color: $dark-text;
-  }
-
-  .menu-list,
-  .profile-form {
-    background: $dark-bg-card;
-  }
-
-  .menu-item {
-    color: $dark-text;
-    border-bottom-color: $dark-border;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.03);
-    }
+  .profile-header h2 { color: $dark-text; }
+  .menu-list { background: $dark-bg-card; }
+  .menu-item { color: $dark-text; border-bottom-color: $dark-border;
+    &:hover { background: rgba(255, 255, 255, 0.03); }
   }
 }
 </style>

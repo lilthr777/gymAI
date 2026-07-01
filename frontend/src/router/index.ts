@@ -80,6 +80,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/CardPage.vue'),
         meta: { title: '会员卡', showTabBar: false, requiresAuth: true },
       },
+      {
+        path: 'edit-profile',
+        name: 'EditProfile',
+        component: () => import('@/views/EditProfile.vue'),
+        meta: { title: '编辑资料', showTabBar: false, requiresAuth: true },
+      },
     ],
   },
 ]
