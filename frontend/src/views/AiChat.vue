@@ -17,8 +17,8 @@
       <div ref="messageListRef" class="chat-body">
         <!-- Empty state -->
         <div v-if="messages.length === 0 && !isStreamingLocal" class="chat-empty">
-          <p class="empty-heading">开始对话</p>
-          <p class="empty-hint">向 AI 助手询问健身房运营相关的问题</p>
+          <p class="empty-heading">Hi，我是你的健身助手</p>
+          <p class="empty-hint">试试下面的问题，或者直接问我～</p>
           <div class="prompt-chips">
             <button
               v-for="prompt in quickPrompts"
@@ -44,7 +44,8 @@
               <span class="cursor-blink">|</span>
             </template>
             <template v-else>
-              {{ msg.content }}
+              <span v-if="msg.role === 'user'">{{ msg.content }}</span>
+              <div v-else class="md-content" v-html="renderMarkdown(msg.content)"></div>
             </template>
           </div>
         </div>
@@ -95,8 +96,26 @@ import { ref, computed, nextTick, onUnmounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Promotion } from '@element-plus/icons-vue'
 import { useChatStore } from '@/stores/chat'
+import { useUserStore } from '@/stores/user'
+import { marked } from 'marked'
+
+// 配置 marked 不转义 HTML（内部数据可信）
+marked.setOptions({ breaks: true, gfm: true })
+
+const renderMarkdown = (text: string) => {
+  if (!text) return ''
+  if (!text) return ''
+  // SSE 流式拼接会吞掉 data 事件之间的 \n，导致 Markdown 表格挤成一行
+  let repaired = text
+    // 1. 表格行间双管道：|表头||分隔行| → |表头|\n|分隔行|
+    .replace(/\|\|(?=\S)/g, '|\n|')
+    // 2. 正文贴表格头：文字|表头| → 文字\n\n|表头|
+    .replace(/([^\n|])\|(?=[^|\n]+\|[^|\n]+\|)/g, '$1\n\n|')
+  return marked.parse(repaired) as string
+}
 
 const chatStore = useChatStore()
+const userStore = useUserStore()
 const messages = computed(() => chatStore.messages)
 
 const inputRef = ref<HTMLInputElement>()
@@ -110,10 +129,10 @@ let typewriterTimer: ReturnType<typeof setInterval> | null = null
 let abortController: AbortController | null = null
 
 const quickPrompts = [
-  '今天有多少会员签到？',
-  '查看本周课程安排',
-  '推荐热门课程',
-  '分析会员增长趋势',
+  '帮我推荐适合减脂的课程',
+  '这周有什么瑜伽课？',
+  '我报了哪些课程？',
+  '本月签到几次了？',
 ]
 
 const scrollToBottom = async () => {
@@ -163,6 +182,8 @@ const handleSend = async () => {
 
   inputText.value = ''
   chatStore.addMessage({ role: 'user', content: text, timestamp: Date.now() })
+  // 先插入空 assistant 消息，后续原地填充内容
+  chatStore.addMessage({ role: 'assistant', content: '', timestamp: Date.now() })
 
   fullResponseBuffer.value = ''
   displayedContent.value = ''
@@ -177,7 +198,7 @@ const handleSend = async () => {
     const response = await fetch('/ai/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text }),
+      body: JSON.stringify({ message: text, userId: userStore.userId }),
       signal: abortController.signal,
     })
 
@@ -198,8 +219,9 @@ const handleSend = async () => {
 
       for (const line of lines) {
         if (line.startsWith('data:')) {
-          const content = line.slice(5).trim()
-          if (content && content !== '[DONE]') {
+          const content = line.slice(5).replace(/^ /, '')
+          if (content === '[DONE]') continue
+          if (content) {
             fullResponseBuffer.value += content
           }
         }
@@ -212,15 +234,16 @@ const handleSend = async () => {
   } finally {
     abortController = null
     finishTypewriter()
-    scrollToBottom()
-
-    if (fullResponseBuffer.value) {
-      chatStore.addMessage({ role: 'assistant', content: fullResponseBuffer.value, timestamp: Date.now() })
+    // 更新最后一条 assistant 消息的内容
+    const msgs = chatStore.messages
+    const lastMsg = msgs[msgs.length - 1]
+    if (lastMsg && lastMsg.role === 'assistant') {
+      lastMsg.content = fullResponseBuffer.value || displayedContent.value
     }
-
     isStreamingLocal.value = false
     fullResponseBuffer.value = ''
     displayedContent.value = ''
+    scrollToBottom()
   }
 }
 
@@ -393,13 +416,13 @@ onUnmounted(() => {
   border-radius: 10px;
   font-size: 14px;
   line-height: 1.6;
-  white-space: pre-wrap;
   word-break: break-word;
 
   &.bubble--user {
     background: $color-cobalt;
     color: $color-sheet;
     border-bottom-right-radius: 4px;
+    white-space: pre-wrap;
   }
 
   &.bubble--bot {
@@ -407,12 +430,29 @@ onUnmounted(() => {
     color: $color-carbon;
     border: 1px solid $color-steel;
     border-bottom-left-radius: 4px;
+    overflow-x: auto;
   }
 }
 
 .cursor-blink {
   animation: blink 1s step-end infinite;
   color: $color-cobalt;
+}
+
+// ── Markdown Content ─────────────────────────
+.md-content {
+  :deep(p) { margin: 0 0 8px; &:last-child { margin-bottom: 0; } }
+  :deep(strong) { font-weight: 600; }
+  :deep(em) { font-style: italic; }
+  :deep(ul), :deep(ol) { margin: 4px 0 8px; padding-left: 20px; }
+  :deep(li) { margin-bottom: 2px; }
+  :deep(code) { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 3px; font-size: 13px; }
+  :deep(pre) { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 6px; overflow-x: auto; margin: 8px 0; }
+  :deep(table) { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  :deep(th) { background: rgba(0,0,0,0.04); font-weight: 600; text-align: left; padding: 8px 10px; border-bottom: 2px solid rgba(0,0,0,0.1); }
+  :deep(td) { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  :deep(hr) { border: none; border-top: 1px solid rgba(0,0,0,0.1); margin: 12px 0; }
+  :deep(blockquote) { border-left: 3px solid $color-cobalt; padding-left: 12px; margin: 8px 0; color: $color-lead; }
 }
 
 @keyframes blink {
@@ -546,6 +586,15 @@ html.dark {
     background: $dark-bg-secondary;
     border-color: $dark-border;
     color: $dark-text;
+  }
+
+  .md-content {
+    :deep(th) { background: rgba(255,255,255,0.06); border-bottom-color: rgba(255,255,255,0.1); }
+    :deep(td) { border-bottom-color: rgba(255,255,255,0.06); }
+    :deep(code) { background: rgba(255,255,255,0.08); }
+    :deep(pre) { background: rgba(255,255,255,0.04); }
+    :deep(hr) { border-top-color: rgba(255,255,255,0.1); }
+    :deep(blockquote) { color: $dark-text-secondary; }
   }
 
   .chat-foot {

@@ -28,12 +28,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
             Long userId = jwtUtil.getUserIdFromToken(token);
             String username = jwtUtil.getUsernameFromToken(token);
-            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(new UserPrincipal(userId, username), null, authorities);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            authenticate(userId, username);
+        } else if ("127.0.0.1".equals(request.getRemoteAddr()) || "0:0:0:0:0:0:0:1".equals(request.getRemoteAddr())) {
+            // 内部服务调用：通过 X-User-Id 头认证
+            String userIdHeader = request.getHeader("X-User-Id");
+            if (StringUtils.hasText(userIdHeader)) {
+                try {
+                    Long userId = Long.parseLong(userIdHeader);
+                    authenticate(userId, "internal");
+                } catch (NumberFormatException ignored) {}
+            }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void authenticate(Long userId, String username) {
+        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(new UserPrincipal(userId, username), null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     private String extractToken(HttpServletRequest request) {
