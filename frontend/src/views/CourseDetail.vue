@@ -32,8 +32,32 @@
     </div>
 
     <div v-if="userStore.isLoggedIn()" class="detail-actions">
+      <template v-if="registered">
+        <div class="action-row">
+          <el-button
+            v-if="!checkedIn"
+            type="success"
+            size="large"
+            :loading="checkingIn"
+            class="action-btn"
+            @click="handleCheckin"
+          >
+            签到
+          </el-button>
+          <el-tag v-if="checkedIn" type="success" size="large" class="checked-in-badge">已签到</el-tag>
+          <el-button
+            type="danger"
+            size="large"
+            :loading="canceling"
+            class="action-btn cancel-btn"
+            @click="handleCancel"
+          >
+            取消报名
+          </el-button>
+        </div>
+      </template>
       <el-button
-        v-if="canRegister"
+        v-else-if="canRegister"
         type="primary"
         size="large"
         :loading="registering"
@@ -42,17 +66,6 @@
       >
         立即报名
       </el-button>
-      <el-button
-        v-if="registered && !checkedIn"
-        type="success"
-        size="large"
-        :loading="checkingIn"
-        class="action-btn"
-        @click="handleCheckin"
-      >
-        签到
-      </el-button>
-      <el-tag v-if="checkedIn" type="success" size="large">已签到</el-tag>
     </div>
 
     <div v-else class="login-hint">
@@ -77,6 +90,7 @@ const registered = ref(false)
 const checkedIn = ref(false)
 const registering = ref(false)
 const checkingIn = ref(false)
+const canceling = ref(false)
 
 const canRegister = computed(() => {
   if (!course.value) return false
@@ -124,11 +138,29 @@ const handleCheckin = async () => {
   }
 }
 
+const handleCancel = async () => {
+  if (!course.value?.id) return
+  canceling.value = true
+  try {
+    await courseApi.cancel(course.value.id)
+    registered.value = false
+    checkedIn.value = false
+    if (course.value) course.value.currentCount--
+    course.value.registered = false
+    ElMessage.success('已取消报名')
+  } catch {
+    // handled
+  } finally {
+    canceling.value = false
+  }
+}
+
 onMounted(async () => {
   const id = Number(route.params.id)
   try {
     const res = await courseApi.getById(id)
     course.value = res.data
+    registered.value = !!res.data.registered
   } catch {
     // handled
   }
@@ -191,11 +223,30 @@ onMounted(async () => {
   padding: 0 8px;
 }
 
+.action-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .action-btn {
   width: 100%;
   height: 48px;
   font-size: 16px;
   font-weight: 500;
+}
+
+.cancel-btn {
+  margin-left: 0 !important;
+}
+
+.checked-in-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  font-size: 15px;
+  width: 100%;
 }
 
 .login-hint {

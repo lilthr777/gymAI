@@ -30,6 +30,7 @@ const tagText = computed(() => {
   if (props.course.status === 0) return '已取消'
   if (props.course.status === 2) return '已满员'
   if (props.course.currentCount >= props.course.maxCapacity) return '已满员'
+  if (props.course.registered) return '已报名'
   return '可报名'
 })
 
@@ -37,6 +38,7 @@ const tagType = computed(() => {
   if (props.course.status === 0) return 'danger'
   if (props.course.status === 2) return 'warning'
   if (props.course.currentCount >= props.course.maxCapacity) return 'warning'
+  if (props.course.registered) return ''
   return 'success'
 })
 </script>

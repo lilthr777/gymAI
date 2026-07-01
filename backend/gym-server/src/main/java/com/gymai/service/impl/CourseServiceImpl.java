@@ -43,8 +43,21 @@ public class CourseServiceImpl implements CourseService {
         });
     }
 
+    /** 标记课程列表中当前用户已报名的课程 */
+    private void markUserRegistered(List<Course> courses, Long userId) {
+        if (courses == null || courses.isEmpty() || userId == null) return;
+        List<Long> courseIds = courses.stream().map(Course::getId).filter(id -> id != null).toList();
+        if (courseIds.isEmpty()) return;
+        List<Long> registeredIds = userCourseMapper.selectList(
+                new LambdaQueryWrapper<UserCourse>()
+                        .eq(UserCourse::getUserId, userId)
+                        .in(UserCourse::getCourseId, courseIds))
+                .stream().map(UserCourse::getCourseId).toList();
+        courses.forEach(c -> c.setRegistered(registeredIds.contains(c.getId())));
+    }
+
     @Override
-    public Result<Page<Course>> page(int pageNum, int pageSize, String keyword, Long coachId) {
+    public Result<Page<Course>> page(int pageNum, int pageSize, String keyword, Long coachId, Long userId) {
         Page<Course> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Course> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Course::getStatus, 1);
@@ -57,13 +70,22 @@ public class CourseServiceImpl implements CourseService {
         wrapper.orderByAsc(Course::getCourseDate).orderByAsc(Course::getStartTime);
         courseMapper.selectPage(page, wrapper);
         fillCoachNames(page.getRecords());
+        markUserRegistered(page.getRecords(), userId);
         return Result.ok(page);
     }
 
     @Override
     public Result<Course> getById(Long id) {
+        return getById(id, null);
+    }
+
+    @Override
+    public Result<Course> getById(Long id, Long userId) {
         Course course = courseMapper.selectById(id);
-        if (course != null) fillCoachNames(List.of(course));
+        if (course != null) {
+            fillCoachNames(List.of(course));
+            markUserRegistered(List.of(course), userId);
+        }
         return Result.ok(course);
     }
 

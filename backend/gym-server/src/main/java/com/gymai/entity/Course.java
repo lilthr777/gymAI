@@ -22,6 +22,8 @@ public class Course {
     private Integer status;
     @TableField(exist = false)
     private String coachName;
+    @TableField(exist = false)
+    private Boolean registered;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
     @TableField(fill = FieldFill.INSERT_UPDATE)

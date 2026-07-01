@@ -6,7 +6,9 @@ import com.gymai.config.UserPrincipal;
 import com.gymai.entity.Course;
 import com.gymai.service.CourseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,18 +18,27 @@ public class CourseController {
 
     private final CourseService courseService;
 
+    /** 从 SecurityContext 中获取当前用户 ID（未登录返回 null） */
+    private Long getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof UserPrincipal up) {
+            return up.userId();
+        }
+        return null;
+    }
+
     @GetMapping
     public Result<Page<Course>> page(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long coachId) {
-        return courseService.page(pageNum, pageSize, keyword, coachId);
+        return courseService.page(pageNum, pageSize, keyword, coachId, getCurrentUserId());
     }
 
     @GetMapping("/{id}")
     public Result<Course> getById(@PathVariable Long id) {
-        return courseService.getById(id);
+        return courseService.getById(id, getCurrentUserId());
     }
 
     @PostMapping("/{id}/register")
