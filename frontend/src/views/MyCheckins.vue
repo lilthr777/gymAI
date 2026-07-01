@@ -1,29 +1,29 @@
 <template>
   <div class="my-checkins">
     <div class="page-nav">
-      <el-button text @click="$router.back()"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+      <button class="back-btn" @click="$router.back()">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+        <span>返回</span>
+      </button>
       <h2>签到记录</h2>
     </div>
 
-    <div v-if="list.length">
+    <div v-if="list.length" class="checkin-list">
       <div v-for="item in list" :key="item.id" class="checkin-item">
         <div class="checkin-left">
           <div class="checkin-time">{{ item.checkinTime?.slice(0, 16)?.replace('T', ' ') }}</div>
           <div class="checkin-course">{{ item.courseName || '课程 #' + item.courseId }}</div>
         </div>
-        <el-tag :type="item.status === 1 ? 'success' : item.status === 2 ? 'warning' : 'info'" size="small">
-          {{ item.status === 1 ? '已签到' : item.status === 2 ? '迟到' : '缺席' }}
-        </el-tag>
+        <span class="checkin-status" :class="statusClass(item.status)">{{ statusText(item.status) }}</span>
       </div>
     </div>
     <div v-else class="empty-box">
-      <span class="empty-emoji">📊</span>
       <p>还没有签到记录</p>
-      <router-link to="/courses" class="empty-link">去约一节课吧</router-link>
+      <router-link to="/courses" class="empty-link">去约一节课吧 &rarr;</router-link>
     </div>
 
     <div v-if="total > list.length" class="load-more">
-      <el-button :loading="loading" @click="loadMore">加载更多</el-button>
+      <el-button :loading="loading" size="large" class="more-btn" @click="loadMore">加载更多</el-button>
     </div>
   </div>
 </template>
@@ -38,6 +38,18 @@ const list = ref<Checkin[]>([])
 const total = ref(0)
 const pageNum = ref(1)
 const loading = ref(false)
+
+const statusText = (status?: number) => {
+  if (status === 1) return '已签到'
+  if (status === 2) return '迟到'
+  return '缺席'
+}
+
+const statusClass = (status?: number) => {
+  if (status === 1) return 'status--ok'
+  if (status === 2) return 'status--warn'
+  return 'status--miss'
+}
 
 const fetchList = async () => {
   loading.value = true
@@ -59,56 +71,127 @@ onMounted(() => fetchList())
 
 <style scoped lang="scss">
 .my-checkins {
-  padding: 16px;
+  padding: 24px 20px;
+  max-width: 680px;
+  margin: 0 auto;
 }
 
 .page-nav {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 
   h2 {
-    font-size: 20px;
+    font-size: $font-size-xl;
     font-weight: 600;
-    color: $color-carbon;
-    margin: 0;
+    color: $color-text-primary;
+    letter-spacing: -0.01em;
   }
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: $color-accent;
+  font-size: $font-size-base;
+  font-family: $font-family;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.checkin-list {
+  background: $color-bg;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-lg;
+  overflow: hidden;
 }
 
 .checkin-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
-  background: $color-sheet;
-  border-radius: $radius-md;
-  margin-bottom: 8px;
+  padding: 16px 20px;
+  border-bottom: 1px solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .checkin-time {
-  font-size: 14px;
-  color: $color-carbon;
+  font-size: $font-size-base;
+  color: $color-text-primary;
   font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .checkin-course {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-top: 3px;
+}
+
+.checkin-status {
   font-size: 12px;
-  color: $color-lead;
-  margin-top: 4px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: $radius-pill;
+  flex-shrink: 0;
+
+  &.status--ok {
+    color: $color-success;
+    background: rgba($color-success, 0.1);
+  }
+
+  &.status--warn {
+    color: $color-warning;
+    background: rgba($color-warning, 0.1);
+  }
+
+  &.status--miss {
+    color: $color-danger;
+    background: rgba($color-danger, 0.1);
+  }
 }
 
 .load-more {
   text-align: center;
-  padding: 16px;
+  padding: 24px 0;
 }
 
-.empty-box { text-align: center; padding: 40px 0; color: $color-lead;
-  .empty-emoji { font-size: 40px; display: block; margin-bottom: 12px; }
-  p { font-size: $font-size-sm; margin-bottom: 8px; }
+.more-btn {
+  border-radius: $radius-pill;
+  font-weight: 500;
 }
-.empty-link { font-size: $font-size-sm; color: $color-cobalt; text-decoration: none; font-weight: 500;
-  &:hover { text-decoration: underline; }
+
+.empty-box {
+  text-align: center;
+  padding: 48px 0;
+  color: $color-text-secondary;
+
+  p {
+    font-size: $font-size-sm;
+    margin-bottom: 8px;
+  }
+}
+
+.empty-link {
+  font-size: $font-size-sm;
+  color: $color-accent;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 html.dark {
@@ -117,8 +200,13 @@ html.dark {
     color: $dark-text;
   }
 
+  .checkin-list {
+    background: $dark-bg;
+    border-color: $dark-border;
+  }
+
   .checkin-item {
-    background: $dark-bg-card;
+    border-bottom-color: $dark-border;
   }
 }
 </style>

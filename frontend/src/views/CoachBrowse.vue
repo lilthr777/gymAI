@@ -1,21 +1,24 @@
 <template>
   <div class="coach-browse">
-    <el-input v-model="keyword" placeholder="搜索教练" clearable class="search-bar" @input="search">
-      <template #prefix><el-icon><Search /></el-icon></template>
-    </el-input>
+    <div class="search-wrap">
+      <el-input v-model="keyword" placeholder="搜索教练" clearable class="search-bar" @input="search">
+        <template #prefix><el-icon><Search /></el-icon></template>
+      </el-input>
+    </div>
 
-    <!-- 分类标签 -->
     <div class="filter-tabs">
       <button v-for="t in tabs" :key="t.key" class="filter-tab" :class="{ active: activeTab === t.key }"
               @click="switchTab(t.key)">{{ t.label }}</button>
     </div>
 
-    <CoachCard v-for="c in filteredList" :key="c.id" :coach="c" @click="$router.push(`/coaches/${c.id}`)" />
+    <div class="list-area">
+      <CoachCard v-for="c in filteredList" :key="c.id" :coach="c" @click="$router.push(`/coaches/${c.id}`)" />
+    </div>
 
     <el-empty v-if="!loading && !filteredList.length" description="暂无教练" />
 
     <div v-if="total > list.length" class="load-more">
-      <el-button :loading="loading" @click="loadMore">加载更多</el-button>
+      <el-button :loading="loading" size="large" class="more-btn" @click="loadMore">加载更多</el-button>
     </div>
   </div>
 </template>
@@ -68,7 +71,6 @@ const filteredList = computed(() => {
 const switchTab = async (key: string) => {
   activeTab.value = key
   if (key === 'favorites') {
-    // 收藏列表：拉全量教练然后本地筛选
     try {
       const [coachRes, favRes] = await Promise.all([
         coachApi.list({ pageNum: 1, pageSize: 100 }),
@@ -101,30 +103,111 @@ const loadMore = () => { pageNum.value++; fetchList() }
 
 onMounted(async () => {
   await fetchList()
-  // 加载收藏列表
   try { favoritedIds.value = (await favoriteApi.ids()).data } catch { /* handled */ }
 })
 </script>
 
 <style scoped lang="scss">
-.coach-browse { padding: 16px; }
-.search-bar { margin-bottom: 12px;
-  :deep(.el-input__wrapper) { border-radius: 20px; }
+.coach-browse {
+  padding: 24px 20px;
+  max-width: 680px;
+  margin: 0 auto;
 }
 
-.filter-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+.search-wrap {
+  margin-bottom: 16px;
 
-.filter-tab { padding: 6px 14px; border: 1px solid $color-steel; border-radius: 20px; background: $color-sheet;
-  font-size: 13px; color: $color-ash; cursor: pointer; white-space: nowrap; transition: all 0.2s;
-  &:hover { border-color: $color-cobalt; color: $color-cobalt; }
-  &.active { background: $color-cobalt; color: #fff; border-color: $color-cobalt; }
+  :deep(.el-input__wrapper) {
+    border-radius: $radius-md;
+    background: $color-bg-secondary;
+    border: none;
+    box-shadow: none;
+    padding: 4px 16px;
+    height: 44px;
+
+    &:hover {
+      background: #f0f0f2;
+      box-shadow: none;
+    }
+
+    &.is-focus {
+      background: $color-bg;
+      box-shadow: 0 0 0 2px $color-accent inset;
+    }
+  }
 }
 
-.load-more { text-align: center; padding: 16px; }
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.filter-tab {
+  padding: 6px 18px;
+  border: none;
+  background: $color-bg-secondary;
+  border-radius: $radius-pill;
+  font-size: $font-size-sm;
+  font-family: $font-family;
+  color: $color-text-primary;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all $transition-fast;
+  font-weight: 500;
+
+  &:hover {
+    background: #e8e8ed;
+  }
+
+  &.active {
+    background: $color-text-primary;
+    color: $color-bg;
+  }
+}
+
+.list-area {
+  background: $color-bg;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border-light;
+  overflow: hidden;
+}
+
+.load-more {
+  text-align: center;
+  padding: 24px 0;
+}
+
+.more-btn {
+  border-radius: $radius-pill;
+  font-weight: 500;
+}
 
 html.dark {
-  .filter-tab { background: $dark-bg-card; border-color: $dark-border; color: $dark-text-secondary;
-    &.active { background: $color-cobalt; color: #fff; }
+  .search-wrap :deep(.el-input__wrapper) {
+    background: $dark-bg-secondary;
+    color: $dark-text;
+
+    &.is-focus {
+      background: $dark-bg-secondary;
+    }
+  }
+
+  .filter-tab {
+    background: $dark-bg-secondary;
+    color: $dark-text;
+
+    &.active {
+      background: $dark-text;
+      color: $dark-bg;
+    }
+  }
+
+  .list-area {
+    background: $dark-bg;
+    border-color: $dark-border;
   }
 }
 </style>

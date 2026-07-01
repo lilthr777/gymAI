@@ -1,19 +1,19 @@
 <template>
   <div class="course-card" @click="$emit('click')">
     <div class="card-left">
-      <div class="card-time">{{ course.courseDate }}</div>
+      <div class="card-date">{{ course.courseDate }}</div>
       <div class="card-hours">{{ course.startTime?.slice(0, 5) }} - {{ course.endTime?.slice(0, 5) }}</div>
     </div>
     <div class="card-body">
       <div class="card-name">{{ course.name }}</div>
       <div class="card-meta">
         <span v-if="course.coachName">{{ course.coachName }}</span>
-        <span v-if="course.coachName" class="meta-sep">|</span>
+        <span v-if="course.coachName" class="meta-sep">&middot;</span>
         <span>{{ course.currentCount }}/{{ course.maxCapacity }}人</span>
       </div>
     </div>
     <div class="card-right">
-      <el-tag :type="tagType" size="small">{{ tagText }}</el-tag>
+      <span class="status-badge" :class="statusClass">{{ tagText }}</span>
     </div>
   </div>
 </template>
@@ -34,12 +34,12 @@ const tagText = computed(() => {
   return '可报名'
 })
 
-const tagType = computed(() => {
-  if (props.course.status === 0) return 'danger'
-  if (props.course.status === 2) return 'warning'
-  if (props.course.currentCount >= props.course.maxCapacity) return 'warning'
-  if (props.course.registered) return ''
-  return 'success'
+const statusClass = computed(() => {
+  if (props.course.status === 0) return 'status--danger'
+  if (props.course.status === 2) return 'status--warning'
+  if (props.course.currentCount >= props.course.maxCapacity) return 'status--warning'
+  if (props.course.registered) return 'status--default'
+  return 'status--success'
 })
 </script>
 
@@ -47,64 +47,105 @@ const tagType = computed(() => {
 .course-card {
   display: flex;
   align-items: center;
-  padding: 14px 16px;
-  background: $color-sheet;
-  border-radius: $radius-md;
-  margin-bottom: 8px;
+  padding: 16px;
+  background: $color-bg;
+  border-bottom: 1px solid $color-border-light;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background $transition-fast;
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transform: translateY(-1px);
+    background: rgba(0, 0, 0, 0.02);
   }
 }
 
 .card-left {
   text-align: center;
-  min-width: 64px;
-  margin-right: 14px;
+  min-width: 72px;
+  margin-right: 16px;
 }
 
-.card-time {
-  font-size: 13px;
+.card-date {
+  font-size: $font-size-base;
   font-weight: 600;
-  color: $color-carbon;
+  color: $color-text-primary;
+  letter-spacing: -0.01em;
 }
 
 .card-hours {
-  font-size: 11px;
-  color: $color-lead;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
   margin-top: 2px;
 }
 
 .card-body {
   flex: 1;
+  min-width: 0;
 }
 
 .card-name {
-  font-size: 15px;
+  font-size: $font-size-base;
   font-weight: 500;
-  color: $color-carbon;
-  margin-bottom: 4px;
+  color: $color-text-primary;
+  margin-bottom: 3px;
+  letter-spacing: -0.01em;
 }
 
 .card-meta {
-  font-size: 12px;
-  color: $color-lead;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
 
   .meta-sep {
-    margin: 0 4px;
-    opacity: 0.5;
+    margin: 0 6px;
+  }
+}
+
+.card-right {
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: $radius-pill;
+
+  &.status--success {
+    color: $color-success;
+    background: rgba($color-success, 0.1);
+  }
+
+  &.status--warning {
+    color: $color-warning;
+    background: rgba($color-warning, 0.1);
+  }
+
+  &.status--danger {
+    color: $color-danger;
+    background: rgba($color-danger, 0.1);
+  }
+
+  &.status--default {
+    color: $color-accent;
+    background: rgba($color-accent, 0.1);
   }
 }
 
 html.dark {
   .course-card {
-    background: $dark-bg-card;
+    background: $dark-bg;
+    border-bottom-color: $dark-border;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
   }
 
-  .card-time,
+  .card-date,
   .card-name {
     color: $dark-text;
   }

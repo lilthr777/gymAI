@@ -1,40 +1,41 @@
 <template>
   <div class="card-page">
     <div class="page-nav">
-      <el-button text @click="router.back()"><el-icon :size="18"><ArrowLeft /></el-icon></el-button>
+      <button class="back-btn" @click="router.back()">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+        <span>返回</span>
+      </button>
       <h2>我的会员卡</h2>
     </div>
 
-    <!-- 实体卡 -->
+    <!-- Membership card -->
     <div class="vip-card" :class="cardClass">
       <div class="card-chip">gymAI</div>
-      <div class="card-body">
-        <div class="card-type">{{ typeLabel }}</div>
-        <div class="card-holder">{{ userStore.nickname }}</div>
-        <div class="card-footer">
-          <div class="card-dates">
-            <div class="date-row">
-              <span class="date-label">开卡</span>
-              <span>{{ info.cardStartDate || '--' }}</span>
-            </div>
-            <div class="date-row">
-              <span class="date-label">到期</span>
-              <span>{{ info.cardEndDate || '终身' }}</span>
-            </div>
+      <div class="card-type">{{ typeLabel }}</div>
+      <div class="card-holder">{{ userStore.nickname }}</div>
+      <div class="card-footer">
+        <div class="card-dates">
+          <div class="date-row">
+            <span class="date-label">开卡</span>
+            <span>{{ info.cardStartDate || '--' }}</span>
           </div>
-          <div class="card-progress" v-if="remaining != null">
-            <div class="progress-bar">
-              <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
-            </div>
-            <span class="progress-text" :class="{ 'text-warn': remaining <= 7 }">
-              {{ remaining <= 0 ? '已过期' : '剩余 ' + remaining + ' 天' }}
-            </span>
+          <div class="date-row">
+            <span class="date-label">到期</span>
+            <span>{{ info.cardEndDate || '终身' }}</span>
           </div>
+        </div>
+        <div class="card-progress" v-if="remaining != null">
+          <div class="progress-bar">
+            <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
+          </div>
+          <span class="progress-text" :class="{ 'text-warn': remaining <= 7 }">
+            {{ remaining <= 0 ? '已过期' : '剩余 ' + remaining + ' 天' }}
+          </span>
         </div>
       </div>
     </div>
 
-    <!-- 续费 -->
+    <!-- Plan selection -->
     <section class="section">
       <h3>{{ info.cardType ? '续费 / 升级' : '开通会员卡' }}</h3>
       <div class="plan-grid">
@@ -42,7 +43,7 @@
              :class="{ selected: selectedPlan === plan.type }"
              @click="selectedPlan = plan.type">
           <div class="plan-name">{{ plan.name }}</div>
-          <div class="plan-price">&yen;{{ plan.price }}<span class="plan-unit">/{{ plan.unit }}</span></div>
+          <div class="plan-price"><span class="plan-currency">&yen;</span>{{ plan.price }}<span class="plan-unit">/{{ plan.unit }}</span></div>
           <div class="plan-desc">{{ plan.desc }}</div>
         </div>
       </div>
@@ -52,7 +53,7 @@
       </el-button>
     </section>
 
-    <!-- 购买记录 -->
+    <!-- Purchase history -->
     <section v-if="info.orders?.length" class="section">
       <h3>购买记录</h3>
       <div class="order-list">
@@ -86,7 +87,6 @@ const plans = [
   { type: 'MONTH', name: '月卡', price: 299, unit: '月', desc: '30天无限次使用' },
   { type: 'QUARTER', name: '季卡', price: 799, unit: '季', desc: '90天，省98元' },
   { type: 'YEAR', name: '年卡', price: 2599, unit: '年', desc: '365天，省989元' },
-  { type: 'LIFETIME', name: '终身卡', price: 0, unit: '', desc: '一次开通，永久有效' },
 ]
 
 const typeMap: Record<string, string> = { MONTH: '月卡', QUARTER: '季卡', YEAR: '年卡', LIFETIME: '终身卡' }
@@ -139,76 +139,284 @@ onMounted(fetchInfo)
 </script>
 
 <style scoped lang="scss">
-.card-page { padding: 14px; }
+.card-page {
+  padding: 24px 20px;
+  max-width: 480px;
+  margin: 0 auto;
+}
 
 .page-nav {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
-  h2 { font-family: $font-display; font-size: $font-size-lg; font-weight: 600; color: $color-carbon; text-transform: uppercase; letter-spacing: 0.03em; }
-}
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
 
-// ── 实体卡片 ────────────────────────────────
-.vip-card {
-  border-radius: $radius-lg; padding: 24px; margin-bottom: 28px; color: #fff;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-
-  &.card-lifetime { background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 50%, #c83a24 100%); }
-  &.card-none { background: linear-gradient(135deg, #555 0%, #333 100%); }
-}
-
-.card-chip { font-family: $font-display; font-size: 18px; opacity: 0.6; letter-spacing: 0.06em; margin-bottom: 20px; }
-
-.card-type { font-family: $font-display; font-size: 28px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 12px; }
-
-.card-holder { font-size: $font-size-base; opacity: 0.8; margin-bottom: 20px; }
-
-.card-dates { display: flex; gap: 32px; margin-bottom: 12px; }
-
-.date-row {
-  display: flex; flex-direction: column; gap: 2px;
-  .date-label { font-size: 10px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.05em; }
-  span { font-size: $font-size-sm; }
-}
-
-.card-progress {
-  .progress-bar { height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-bottom: 6px; }
-  .progress-fill { height: 100%; background: #fff; border-radius: 2px; transition: width 0.5s; }
-  .progress-text { font-size: $font-size-sm; opacity: 0.7;
-    &.text-warn { color: #ff9f43; opacity: 1; }
+  h2 {
+    font-size: $font-size-xl;
+    font-weight: 600;
+    color: $color-text-primary;
+    letter-spacing: -0.01em;
   }
 }
 
-// ── 套餐选择 ────────────────────────────────
-.section { margin-bottom: 28px;
-  h3 { font-family: $font-display; font-size: $font-size-lg; font-weight: 600; color: $color-carbon; margin-bottom: 12px; }
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: $color-accent;
+  font-size: $font-size-base;
+  font-family: $font-family;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
-.plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+// ── Card — Apple Card style ─────────────────
+.vip-card {
+  border-radius: $radius-lg;
+  padding: 28px 24px 24px;
+  margin-bottom: 36px;
+  color: #fff;
+  background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 50%, #1c1c1e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  &.card-lifetime {
+    background: linear-gradient(135deg, #1c1c1e 0%, #2d1b69 50%, #8b3a3a 100%);
+  }
+
+  &.card-none {
+    background: linear-gradient(135deg, #8e8e93 0%, #636366 100%);
+  }
+}
+
+.card-chip {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.5;
+  letter-spacing: 0.04em;
+  margin-bottom: 24px;
+}
+
+.card-type {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.card-holder {
+  font-size: $font-size-sm;
+  opacity: 0.6;
+  margin-bottom: 24px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.card-dates {
+  display: flex;
+  gap: 28px;
+}
+
+.date-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .date-label {
+    font-size: 10px;
+    opacity: 0.4;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
+  span {
+    font-size: $font-size-xs;
+  }
+}
+
+.card-progress {
+  text-align: right;
+
+  .progress-bar {
+    width: 80px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    margin-bottom: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 2px;
+    transition: width 0.5s;
+  }
+
+  .progress-text {
+    font-size: 11px;
+    opacity: 0.5;
+
+    &.text-warn {
+      color: $color-warning;
+      opacity: 1;
+    }
+  }
+}
+
+// ── Plans ────────────────────────────────────
+.section {
+  margin-bottom: 36px;
+
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: $color-text-primary;
+    margin-bottom: 16px;
+  }
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
 
 .plan-card {
-  border: 2px solid $color-steel; border-radius: $radius-md; padding: 16px; cursor: pointer; text-align: center; transition: all $transition-fast;
-  &:hover { border-color: $color-cobalt; }
-  &.selected { border-color: $color-cobalt; background: rgba($color-cobalt, 0.05); }
+  border: 2px solid $color-border-light;
+  border-radius: $radius-md;
+  padding: 20px 16px;
+  cursor: pointer;
+  text-align: center;
+  transition: all $transition-fast;
+  background: $color-bg;
+
+  &:hover {
+    border-color: $color-accent;
+  }
+
+  &.selected {
+    border-color: $color-accent;
+  }
 }
 
-.plan-name { font-family: $font-display; font-size: $font-size-lg; font-weight: 600; color: $color-carbon; margin-bottom: 6px; text-transform: uppercase; }
-.plan-price { font-size: $font-size-xl; font-weight: 700; color: $color-cobalt; margin-bottom: 4px; }
-.plan-unit { font-size: $font-size-sm; color: $color-lead; font-weight: 400; }
-.plan-desc { font-size: $font-size-sm; color: $color-lead; }
+.plan-name {
+  font-size: $font-size-base;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
 
-.renew-btn { width: 100%; height: 48px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.plan-price {
+  font-size: $font-size-2xl;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
 
-// ── 购买记录 ────────────────────────────────
+.plan-currency {
+  font-size: $font-size-base;
+  font-weight: 500;
+}
+
+.plan-unit {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: 400;
+}
+
+.plan-desc {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.renew-btn {
+  width: 100%;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: $radius-md;
+}
+
+// ── Orders ───────────────────────────────────
+.order-list {
+  background: $color-bg;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+
 .order-row {
-  display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: $color-sheet; border-radius: $radius-md; margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
-.order-left { display: flex; flex-direction: column; gap: 2px; }
-.order-type { font-size: $font-size-sm; color: $color-carbon; font-weight: 500; }
-.order-time { font-size: $font-size-sm; color: $color-lead; }
-.order-amount { font-weight: 600; color: $color-cobalt; }
+
+.order-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.order-type {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: 500;
+}
+
+.order-time {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.order-amount {
+  font-weight: 600;
+  color: $color-text-primary;
+  letter-spacing: -0.01em;
+}
 
 html.dark {
-  .page-nav h2, .section h3, .plan-name, .order-type { color: $dark-text; }
-  .plan-card { border-color: $dark-border; }
-  .order-row { background: $dark-bg-card; }
+  .page-nav h2,
+  .section h3,
+  .plan-name,
+  .plan-price,
+  .order-type,
+  .order-amount {
+    color: $dark-text;
+  }
+
+  .plan-card {
+    background: $dark-bg-secondary;
+    border-color: $dark-border;
+  }
+
+  .order-list {
+    background: $dark-bg;
+    border-color: $dark-border;
+  }
+
+  .order-row {
+    border-bottom-color: $dark-border;
+  }
 }
 </style>

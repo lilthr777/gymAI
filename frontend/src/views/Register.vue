@@ -107,46 +107,48 @@ const handleRegister = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: $color-magnesium;
+  background: $color-bg;
   padding: 24px;
 }
 
 .register-card {
   width: 100%;
-  max-width: 380px;
-  background: $color-sheet;
-  padding: 40px 36px;
+  max-width: 400px;
+  background: $color-bg;
+  padding: 40px;
   border-radius: $radius-lg;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid $color-border-light;
 }
 
 .form-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: $color-carbon;
-  margin-bottom: 6px;
+  font-size: $font-size-2xl;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $color-text-primary;
+  margin-bottom: 4px;
 }
 
 .form-desc {
-  color: $color-lead;
-  font-size: 14px;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
   margin-bottom: 32px;
 }
 
 .register-btn {
   width: 100%;
-  height: 44px;
-  font-size: 15px;
+  height: 48px;
+  font-size: 16px;
   font-weight: 500;
+  border-radius: $radius-md;
 }
 
 .form-hint {
   text-align: center;
-  color: #B0B4BA;
-  font-size: 12px;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
 
   .login-link {
-    color: $color-cobalt;
+    color: $color-accent;
     text-decoration: none;
     font-weight: 500;
 
@@ -163,10 +165,17 @@ html.dark {
 
   .register-card {
     background: $dark-bg-secondary;
+    border-color: $dark-border;
   }
 
   .form-title {
     color: $dark-text;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-card {
+    padding: 28px 24px;
   }
 }
 </style>

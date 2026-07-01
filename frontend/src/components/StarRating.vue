@@ -13,10 +13,21 @@ defineEmits<{ 'update:modelValue': [value: number] }>()
 </script>
 
 <style scoped lang="scss">
-.star { font-size: 18px; margin-right: 2px; color: #ddd;
-  &.filled { color: #f5a623; }
+.star {
+  font-size: 20px;
+  margin-right: 2px;
+  color: $color-border-light;
+
+  &.filled {
+    color: #ff9f0a;
+  }
 }
-.interactive .star { cursor: pointer;
-  &:hover { color: #f5a623; }
+
+.interactive .star {
+  cursor: pointer;
+
+  &:hover {
+    color: #ff9f0a;
+  }
 }
 </style>

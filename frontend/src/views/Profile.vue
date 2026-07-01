@@ -1,7 +1,7 @@
 <template>
   <div class="profile-page">
     <div class="profile-header">
-      <el-avatar :size="64" icon="UserFilled" :src="profile.avatar" />
+      <el-avatar :size="72" icon="UserFilled" :src="profile.avatar" />
       <h2>{{ profile.nickname }}</h2>
     </div>
 
@@ -9,25 +9,25 @@
       <div class="menu-item" @click="$router.push('/edit-profile')">
         <span>编辑资料</span>
         <span class="menu-extra">{{ profile.nickname }}</span>
-        <el-icon><ArrowRight /></el-icon>
+        <el-icon :size="16" class="menu-arrow"><ArrowRight /></el-icon>
       </div>
       <div class="menu-item" @click="$router.push('/my-courses')">
         <span>我的课程</span>
-        <el-icon><ArrowRight /></el-icon>
+        <el-icon :size="16" class="menu-arrow"><ArrowRight /></el-icon>
       </div>
       <div class="menu-item" @click="$router.push('/my-checkins')">
         <span>签到记录</span>
-        <el-icon><ArrowRight /></el-icon>
+        <el-icon :size="16" class="menu-arrow"><ArrowRight /></el-icon>
       </div>
       <div class="menu-item" @click="$router.push('/card')">
         <span>会员卡</span>
         <span class="menu-extra">{{ profile.cardType ? cardLabel : '未开通' }}</span>
-        <el-icon><ArrowRight /></el-icon>
+        <el-icon :size="16" class="menu-arrow"><ArrowRight /></el-icon>
       </div>
     </div>
 
     <div class="logout-area">
-      <el-button type="danger" plain @click="handleLogout">退出登录</el-button>
+      <button class="logout-btn" @click="handleLogout">退出登录</button>
     </div>
   </div>
 </template>
@@ -61,46 +61,102 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .profile-page {
-  padding: 16px;
+  padding: 32px 24px;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
 .profile-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 0;
+  padding: 24px 0 36px;
 
   h2 {
-    font-size: 20px;
-    font-weight: 600;
-    color: $color-carbon;
-    margin: 12px 0 0;
+    font-size: $font-size-2xl;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: $color-text-primary;
+    margin-top: 16px;
   }
 }
 
 .menu-list {
-  background: $color-sheet;
+  background: $color-bg;
+  border: 1px solid $color-border-light;
   border-radius: $radius-lg;
-  margin-bottom: 24px;
   overflow: hidden;
+  margin-bottom: 32px;
 }
 
 .menu-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 16px; cursor: pointer;
-  border-bottom: 1px solid $color-steel; font-size: 14px; color: $color-carbon;
-  &:last-child { border-bottom: none; }
-  &:hover { background: rgba(0, 0, 0, 0.02); }
-}
-.menu-extra { font-size: $font-size-sm; color: $color-lead; flex: 1; text-align: right; margin-right: 12px; }
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  font-size: $font-size-base;
+  color: $color-text-primary;
+  border-bottom: 1px solid $color-border-light;
+  transition: background $transition-fast;
+  letter-spacing: -0.01em;
 
-.logout-area { padding: 32px 0; text-align: center; }
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
+}
+
+.menu-extra {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex: 1;
+  text-align: right;
+  margin-right: 8px;
+}
+
+.menu-arrow {
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}
+
+.logout-area {
+  text-align: center;
+}
+
+.logout-btn {
+  padding: 12px 32px;
+  border: none;
+  background: none;
+  font-size: $font-size-sm;
+  font-family: $font-family;
+  color: $color-danger;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
 
 html.dark {
-  .profile-header h2 { color: $dark-text; }
-  .menu-list { background: $dark-bg-card; }
-  .menu-item { color: $dark-text; border-bottom-color: $dark-border;
-    &:hover { background: rgba(255, 255, 255, 0.03); }
+  .profile-header h2 {
+    color: $dark-text;
+  }
+
+  .menu-list {
+    background: $dark-bg-secondary;
+    border-color: $dark-border;
+  }
+
+  .menu-item {
+    color: $dark-text;
+    border-bottom-color: $dark-border;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
   }
 }
 </style>

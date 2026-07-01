@@ -1,13 +1,20 @@
 <template>
   <div class="course-detail" v-if="course">
+    <!-- Page nav -->
     <div class="page-nav">
-      <el-button text @click="$router.back()"><el-icon><ArrowLeft /></el-icon>返回</el-button>
-    </div>
-    <div class="detail-header">
-      <h2>{{ course.name }}</h2>
-      <el-tag :type="statusTagType">{{ statusText }}</el-tag>
+      <button class="back-btn" @click="$router.back()">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+        <span>返回</span>
+      </button>
     </div>
 
+    <!-- Course header -->
+    <div class="detail-header">
+      <h2>{{ course.name }}</h2>
+      <span class="status-badge" :class="statusBadgeClass">{{ statusText }}</span>
+    </div>
+
+    <!-- Info -->
     <div class="detail-info">
       <div class="info-row">
         <span class="info-label">日期</span>
@@ -29,25 +36,25 @@
         <span class="info-label">描述</span>
         <span class="info-value">{{ course.description || '暂无描述' }}</span>
       </div>
-      <!-- 签到反馈 -->
       <div v-if="checkinTime" class="info-row checkin-row">
         <span class="info-label">签到</span>
         <span class="info-value checkin-ok">已签到 {{ checkinTime }}</span>
       </div>
     </div>
 
+    <!-- Actions -->
     <div v-if="userStore.isLoggedIn()" class="detail-actions">
       <template v-if="registered">
         <template v-if="!checkedIn">
           <el-button type="success" size="large" :loading="checkingIn" class="action-btn" @click="handleCheckin">
             签到
           </el-button>
-          <el-button type="danger" plain size="large" :loading="canceling" class="action-btn ghost-btn" @click="handleCancel">
-            取消报名
-          </el-button>
+          <button class="text-btn danger" :disabled="canceling" @click="handleCancel">
+            {{ canceling ? '取消中...' : '取消报名' }}
+          </button>
         </template>
         <div v-else class="done-box">
-          <el-icon :size="18"><CircleCheckFilled /></el-icon>
+          <el-icon :size="20"><CircleCheckFilled /></el-icon>
           <span>已签到</span>
           <span v-if="checkinTime" class="done-time">{{ checkinTime }}</span>
         </div>
@@ -61,7 +68,7 @@
       <router-link to="/login">登录</router-link> 后即可报名和签到
     </div>
 
-    <!-- 评价 -->
+    <!-- Reviews -->
     <div class="review-section">
       <div class="section-head">
         <h3>学员评价</h3>
@@ -106,7 +113,6 @@ const route = useRoute()
 const userStore = useUserStore()
 const course = ref<Course | null>(null)
 
-// 评价
 const reviews = ref<any[]>([])
 const myRating = ref(5)
 const myComment = ref('')
@@ -136,6 +142,7 @@ const submitReview = async () => {
   } catch { /* handled */ }
   finally { submittingReview.value = false }
 }
+
 const registered = ref(false)
 const checkedIn = ref(false)
 const checkinTime = ref('')
@@ -151,11 +158,12 @@ const statusText = computed(() => {
   if (registered.value) return '已报名'
   return '可报名'
 })
-const statusTagType = computed(() => {
-  if (course.value?.status === 0) return 'danger'
-  if (course.value?.status === 2) return 'warning'
-  if (registered.value) return ''
-  return 'success'
+
+const statusBadgeClass = computed(() => {
+  if (course.value?.status === 0) return 'status--danger'
+  if (course.value?.status === 2) return 'status--warning'
+  if (registered.value) return 'status--default'
+  return 'status--success'
 })
 
 const handleRegister = async () => {
@@ -211,67 +219,304 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-.course-detail { padding: 16px; }
-.page-nav { margin-bottom: 12px; }
-
-.detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
-  h2 { font-size: 22px; font-weight: 600; color: $color-carbon; margin: 0; }
+.course-detail {
+  padding: 24px 20px;
+  max-width: 680px;
+  margin: 0 auto;
 }
 
-.detail-info { background: $color-sheet; border-radius: $radius-lg; padding: 16px; margin-bottom: 24px; }
-
-.info-row { display: flex; padding: 10px 0; border-bottom: 1px solid $color-steel;
-  &:last-child { border-bottom: none; }
-}
-.info-label { width: 56px; font-size: 14px; color: $color-lead; flex-shrink: 0; }
-.info-value { font-size: 14px; color: $color-carbon;
-  &.link { color: $color-cobalt; cursor: pointer; &:hover { text-decoration: underline; } }
+.page-nav {
+  margin-bottom: 24px;
 }
 
-.checkin-row { border-bottom: none; }
-.checkin-ok { color: $color-cobalt; font-weight: 500; }
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: $color-accent;
+  font-size: $font-size-base;
+  font-family: $font-family;
+  cursor: pointer;
 
-.detail-actions { padding: 0 8px; display: flex; flex-direction: column; gap: 10px; }
-
-.action-btn { width: 100%; height: 48px; font-size: 16px; font-weight: 500; }
-.ghost-btn { margin-left: 0 !important; }
-
-.done-box { display: flex; align-items: center; gap: 8px; padding: 12px 0; color: $color-cobalt; font-size: $font-size-base; font-weight: 500;
-  .done-time { color: $color-lead; font-weight: 400; font-size: $font-size-sm; }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
-.login-hint { text-align: center; padding: 24px; font-size: 14px; color: $color-lead;
-  a { color: $color-cobalt; font-weight: 500; }
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: $font-size-3xl;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: $color-text-primary;
+    line-height: 1.15;
+  }
 }
 
-// 评价
-.review-section { margin-top: 28px; padding: 0 4px; }
-.section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
-  h3 { font-size: 16px; font-weight: 600; color: $color-carbon; }
-}
-.avg-rating { font-size: 14px; color: #f5a623; font-weight: 600; }
-.review-list { margin-bottom: 16px; }
-.review-item { padding: 12px 0; border-bottom: 1px solid $color-steel;
-  &:last-child { border-bottom: none; }
-}
-.review-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-.review-author { font-size: 13px; font-weight: 500; color: $color-carbon; }
-.review-time { font-size: 11px; color: $color-lead; margin-left: auto; }
-.review-text { font-size: 13px; color: $color-ash; line-height: 1.5; }
+.status-badge {
+  font-size: $font-size-xs;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: $radius-pill;
+  flex-shrink: 0;
+  white-space: nowrap;
 
-.review-form { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
-.review-rate { display: flex; align-items: center; gap: 10px; }
-.rate-label { font-size: 13px; color: $color-lead; }
-.review-done { font-size: 13px; color: $color-lead; text-align: center; padding: 12px 0; }
+  &.status--success {
+    color: $color-success;
+    background: rgba($color-success, 0.1);
+  }
+  &.status--warning {
+    color: $color-warning;
+    background: rgba($color-warning, 0.1);
+  }
+  &.status--danger {
+    color: $color-danger;
+    background: rgba($color-danger, 0.1);
+  }
+  &.status--default {
+    color: $color-accent;
+    background: rgba($color-accent, 0.1);
+  }
+}
+
+// Info
+.detail-info {
+  background: $color-bg;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.info-row {
+  display: flex;
+  padding: 14px 20px;
+  border-bottom: 1px solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.info-label {
+  width: 52px;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex-shrink: 0;
+}
+
+.info-value {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+
+  &.link {
+    color: $color-accent;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.checkin-row {
+  border-bottom: none;
+}
+
+.checkin-ok {
+  color: $color-success;
+  font-weight: 500;
+}
+
+// Actions
+.detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.action-btn {
+  width: 100%;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: $radius-md;
+}
+
+.text-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  background: none;
+  font-size: $font-size-sm;
+  font-family: $font-family;
+  color: $color-danger;
+  cursor: pointer;
+  text-align: center;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.done-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 0;
+  color: $color-success;
+  font-size: $font-size-base;
+  font-weight: 500;
+}
+
+.done-time {
+  color: $color-text-secondary;
+  font-weight: 400;
+  font-size: $font-size-sm;
+}
+
+.login-hint {
+  text-align: center;
+  padding: 32px 0;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+
+  a {
+    color: $color-accent;
+    font-weight: 500;
+  }
+}
+
+// Reviews
+.review-section {
+  border-top: 1px solid $color-border-light;
+  padding-top: 32px;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+}
+
+.avg-rating {
+  font-size: $font-size-base;
+  color: #ff9f0a;
+  font-weight: 600;
+}
+
+.review-list {
+  margin-bottom: 20px;
+}
+
+.review-item {
+  padding: 16px 0;
+  border-bottom: 1px solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.review-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.review-author {
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-text-primary;
+}
+
+.review-time {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-left: auto;
+}
+
+.review-text {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.5;
+}
+
+.review-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-rate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rate-label {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.review-done {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  text-align: center;
+  padding: 16px 0;
+}
 
 html.dark {
-  .section-head h3, .review-author { color: $dark-text; }
-  .review-item { border-bottom-color: $dark-border; }
-}
+  .detail-header h2,
+  .info-value {
+    color: $dark-text;
+  }
 
-html.dark {
-  .detail-header h2, .info-value { color: $dark-text; }
-  .detail-info { background: $dark-bg-card; border-color: $dark-border; }
-  .info-row { border-bottom-color: $dark-border; }
+  .detail-info {
+    background: $dark-bg-secondary;
+    border-color: $dark-border;
+  }
+
+  .info-row {
+    border-bottom-color: $dark-border;
+  }
+
+  .review-item {
+    border-bottom-color: $dark-border;
+  }
+
+  .section-head h3,
+  .review-author {
+    color: $dark-text;
+  }
+
+  .review-section {
+    border-top-color: $dark-border;
+  }
 }
 </style>

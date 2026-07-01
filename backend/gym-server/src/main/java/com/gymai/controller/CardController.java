@@ -45,7 +45,7 @@ public class CardController {
     public Result<?> renew(@AuthenticationPrincipal UserPrincipal principal,
                            @RequestBody Map<String, String> body) {
         String cardType = body.get("cardType");
-        if (cardType == null || !List.of("MONTH", "QUARTER", "YEAR", "LIFETIME").contains(cardType)) {
+        if (cardType == null || !List.of("MONTH", "QUARTER", "YEAR").contains(cardType)) {
             return Result.error(400, "无效的卡类型");
         }
 

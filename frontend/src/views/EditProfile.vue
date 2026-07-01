@@ -1,12 +1,15 @@
 <template>
   <div class="edit-profile">
     <div class="page-nav">
-      <el-button text @click="$router.back()"><el-icon :size="18"><ArrowLeft /></el-icon></el-button>
+      <button class="back-btn" @click="$router.back()">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+        <span>返回</span>
+      </button>
       <h2>编辑资料</h2>
     </div>
 
     <div class="avatar-section">
-      <el-avatar :size="72" icon="UserFilled" :src="profile.avatar" />
+      <el-avatar :size="80" icon="UserFilled" :src="profile.avatar" />
       <p class="avatar-hint">头像</p>
     </div>
 
@@ -26,7 +29,7 @@
     </div>
 
     <div class="form-card">
-      <div class="section-title">可修改信息</div>
+      <p class="section-title">可修改信息</p>
       <el-form :model="form" label-width="56px" size="large">
         <el-form-item label="昵称">
           <el-input v-model="form.nickname" maxlength="20" show-word-limit />
@@ -96,34 +99,127 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-.edit-profile { padding: 16px; }
-
-.page-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 24px;
-  h2 { font-family: $font-display; font-size: $font-size-lg; font-weight: 600; color: $color-carbon; text-transform: uppercase; letter-spacing: 0.03em; }
+.edit-profile {
+  padding: 24px 20px;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
-.avatar-section { text-align: center; margin-bottom: 24px; }
-.avatar-hint { font-size: $font-size-sm; color: $color-lead; margin-top: 10px; }
+.page-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
 
-.info-card { background: $color-sheet; border-radius: $radius-lg; padding: 4px 16px; margin-bottom: 20px; }
-
-.info-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid $color-steel;
-  &:last-child { border-bottom: none; }
+  h2 {
+    font-size: $font-size-xl;
+    font-weight: 600;
+    color: $color-text-primary;
+    letter-spacing: -0.01em;
+  }
 }
-.info-label { font-size: $font-size-sm; color: $color-lead; }
-.info-value { font-size: $font-size-sm; color: $color-carbon; }
 
-.section-title { font-size: $font-size-sm; font-weight: 600; color: $color-lead; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: $color-accent;
+  font-size: $font-size-base;
+  font-family: $font-family;
+  cursor: pointer;
 
-.form-card { background: $color-sheet; border-radius: $radius-lg; padding: 16px; margin-bottom: 24px; }
+  &:hover {
+    text-decoration: underline;
+  }
+}
 
-.save-btn { width: 100%; height: 48px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.avatar-section {
+  text-align: center;
+  margin-bottom: 32px;
+}
 
-.btn-area { padding: 0 4px; }
+.avatar-hint {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-top: 10px;
+}
+
+.info-card {
+  background: $color-bg;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.info-label {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.info-value {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.section-title {
+  font-size: $font-size-xs;
+  font-weight: 600;
+  color: $color-text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 16px;
+}
+
+.form-card {
+  background: $color-bg;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-lg;
+  padding: 20px;
+  margin-bottom: 28px;
+}
+
+.save-btn {
+  width: 100%;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: $radius-md;
+}
+
+.btn-area {
+  padding: 0 4px;
+}
 
 html.dark {
-  .page-nav h2, .info-value { color: $dark-text; }
-  .info-card, .form-card { background: $dark-bg-card; }
-  .info-item { border-bottom-color: $dark-border; }
+  .page-nav h2,
+  .info-value {
+    color: $dark-text;
+  }
+
+  .info-card,
+  .form-card {
+    background: $dark-bg-secondary;
+    border-color: $dark-border;
+  }
+
+  .info-item {
+    border-bottom-color: $dark-border;
+  }
 }
 </style>

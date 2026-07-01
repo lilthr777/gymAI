@@ -7,7 +7,7 @@
           <span class="chat-dot"></span>
           AI 助手
         </div>
-        <button class="chat-top__clear" @click="handleClear" :disabled="messages.length === 0">
+        <button class="chat-top__clear" :disabled="messages.length === 0" @click="handleClear">
           <el-icon size="16"><Delete /></el-icon>
           <span>清空</span>
         </button>
@@ -18,7 +18,7 @@
         <!-- Empty state -->
         <div v-if="messages.length === 0 && !isStreamingLocal" class="chat-empty">
           <p class="empty-heading">Hi，我是你的健身助手</p>
-          <p class="empty-hint">试试下面的问题，或者直接问我～</p>
+          <p class="empty-hint">试试下面的问题，或者直接问我</p>
           <div class="prompt-chips">
             <button
               v-for="prompt in quickPrompts"
@@ -99,17 +99,12 @@ import { useChatStore } from '@/stores/chat'
 import { useUserStore } from '@/stores/user'
 import { marked } from 'marked'
 
-// 配置 marked 不转义 HTML（内部数据可信）
 marked.setOptions({ breaks: true, gfm: true })
 
 const renderMarkdown = (text: string) => {
   if (!text) return ''
-  if (!text) return ''
-  // SSE 流式拼接会吞掉 data 事件之间的 \n，导致 Markdown 表格挤成一行
   let repaired = text
-    // 1. 表格行间双管道：|表头||分隔行| → |表头|\n|分隔行|
     .replace(/\|\|(?=\S)/g, '|\n|')
-    // 2. 正文贴表格头：文字|表头| → 文字\n\n|表头|
     .replace(/([^\n|])\|(?=[^|\n]+\|[^|\n]+\|)/g, '$1\n\n|')
   return marked.parse(repaired) as string
 }
@@ -185,7 +180,6 @@ const handleSend = async () => {
 
   inputText.value = ''
   chatStore.addMessage({ role: 'user', content: text, timestamp: Date.now() })
-  // 先插入空 assistant 消息，后续原地填充内容
   chatStore.addMessage({ role: 'assistant', content: '', timestamp: Date.now() })
 
   fullResponseBuffer.value = ''
@@ -237,7 +231,6 @@ const handleSend = async () => {
   } finally {
     abortController = null
     finishTypewriter()
-    // 更新最后一条 assistant 消息的内容
     const msgs = chatStore.messages
     const lastMsg = msgs[msgs.length - 1]
     if (lastMsg && lastMsg.role === 'assistant') {
@@ -277,7 +270,6 @@ onUnmounted(() => {
   height: 100%;
   display: flex;
   justify-content: center;
-  padding: 20px;
 }
 
 .chat-panel {
@@ -285,10 +277,8 @@ onUnmounted(() => {
   max-width: 780px;
   display: flex;
   flex-direction: column;
-  background: $color-sheet;
-  border: 1px solid $color-steel;
-  border-radius: $radius-lg;
-  overflow: hidden;
+  background: $color-bg;
+  height: 100%;
 }
 
 // ── Top ──────────────────────────────────────
@@ -297,38 +287,37 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid $color-steel;
+  border-bottom: 1px solid $color-border-light;
 
   &__title {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 15px;
+    gap: 8px;
+    font-size: $font-size-base;
     font-weight: 600;
-    color: $color-carbon;
+    color: $color-text-primary;
   }
 
   &__clear {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     padding: 6px 12px;
-    border: 1px solid $color-steel;
+    border: none;
     background: transparent;
     border-radius: $radius-sm;
-    color: $color-lead;
-    font-size: 13px;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+    font-family: $font-family;
     cursor: pointer;
-    font-family: $font-body;
     transition: all $transition-fast;
 
     &:hover:not(:disabled) {
-      border-color: $color-iron-red;
-      color: $color-iron-red;
+      color: $color-danger;
     }
 
     &:disabled {
-      opacity: 0.35;
+      opacity: 0.3;
       cursor: default;
     }
   }
@@ -338,7 +327,7 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #5C9A4F;
+  background: $color-success;
 }
 
 // ── Body ─────────────────────────────────────
@@ -348,8 +337,8 @@ onUnmounted(() => {
   padding: 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  background: #FAF9F7;
+  gap: 16px;
+  background: $color-bg;
 }
 
 .chat-empty {
@@ -364,16 +353,15 @@ onUnmounted(() => {
 }
 
 .empty-heading {
-  font-size: 17px;
+  font-size: $font-size-xl;
   font-weight: 600;
-  color: $color-carbon;
-  margin: 0;
+  color: $color-text-primary;
 }
 
 .empty-hint {
-  font-size: 14px;
-  color: $color-lead;
-  margin: 0 0 16px;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: 16px;
 }
 
 .prompt-chips {
@@ -384,26 +372,26 @@ onUnmounted(() => {
 }
 
 .prompt-chip {
-  padding: 8px 16px;
-  font-size: 13px;
-  font-family: $font-body;
-  color: $color-ash;
-  background: $color-sheet;
-  border: 1px solid $color-steel;
-  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: $font-size-sm;
+  font-family: $font-family;
+  color: $color-accent;
+  background: $color-bg;
+  border: 1px solid $color-accent;
+  border-radius: $radius-pill;
   cursor: pointer;
   transition: all $transition-fast;
 
   &:hover {
-    border-color: $color-cobalt;
-    color: $color-cobalt;
+    background: $color-accent;
+    color: $color-bg;
   }
 }
 
-// ── Messages ─────────────────────────────────
+// ── Messages — iMessage-style ────────────────
 .msg-row {
   display: flex;
-  max-width: 82%;
+  max-width: 80%;
 
   &.msg--user {
     align-self: flex-end;
@@ -415,47 +403,31 @@ onUnmounted(() => {
 }
 
 .msg-bubble {
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-size: 14px;
-  line-height: 1.6;
+  padding: 10px 16px;
+  border-radius: 18px;
+  font-size: $font-size-base;
+  line-height: 1.45;
   word-break: break-word;
+  letter-spacing: -0.01em;
 
   &.bubble--user {
-    background: $color-cobalt;
-    color: $color-sheet;
-    border-bottom-right-radius: 4px;
+    background: $color-accent;
+    color: #fff;
+    border-bottom-right-radius: 6px;
     white-space: pre-wrap;
   }
 
   &.bubble--bot {
-    background: $color-sheet;
-    color: $color-carbon;
-    border: 1px solid $color-steel;
-    border-bottom-left-radius: 4px;
+    background: #e9e9eb;
+    color: $color-text-primary;
+    border-bottom-left-radius: 6px;
     overflow-x: auto;
   }
 }
 
 .cursor-blink {
   animation: blink 1s step-end infinite;
-  color: $color-cobalt;
-}
-
-// ── Markdown Content ─────────────────────────
-.md-content {
-  :deep(p) { margin: 0 0 8px; &:last-child { margin-bottom: 0; } }
-  :deep(strong) { font-weight: 600; }
-  :deep(em) { font-style: italic; }
-  :deep(ul), :deep(ol) { margin: 4px 0 8px; padding-left: 20px; }
-  :deep(li) { margin-bottom: 2px; }
-  :deep(code) { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 3px; font-size: 13px; }
-  :deep(pre) { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 6px; overflow-x: auto; margin: 8px 0; }
-  :deep(table) { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
-  :deep(th) { background: rgba(0,0,0,0.04); font-weight: 600; text-align: left; padding: 8px 10px; border-bottom: 2px solid rgba(0,0,0,0.1); }
-  :deep(td) { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.06); }
-  :deep(hr) { border: none; border-top: 1px solid rgba(0,0,0,0.1); margin: 12px 0; }
-  :deep(blockquote) { border-left: 3px solid $color-cobalt; padding-left: 12px; margin: 8px 0; color: $color-lead; }
+  color: $color-accent;
 }
 
 @keyframes blink {
@@ -463,39 +435,55 @@ onUnmounted(() => {
   51%, 100% { opacity: 0; }
 }
 
+// ── Markdown ─────────────────────────────────
+.md-content {
+  :deep(p) { margin: 0 0 6px; &:last-child { margin-bottom: 0; } }
+  :deep(strong) { font-weight: 600; }
+  :deep(ul), :deep(ol) { margin: 4px 0 6px; padding-left: 20px; }
+  :deep(li) { margin-bottom: 2px; }
+  :deep(code) { background: rgba(0,0,0,0.08); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+  :deep(pre) { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+  :deep(table) { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  :deep(th) { background: rgba(0,0,0,0.04); font-weight: 600; text-align: left; padding: 8px 10px; border-bottom: 2px solid rgba(0,0,0,0.1); }
+  :deep(td) { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  :deep(hr) { border: none; border-top: 1px solid rgba(0,0,0,0.1); margin: 12px 0; }
+  :deep(blockquote) { border-left: 3px solid $color-accent; padding-left: 12px; margin: 8px 0; color: $color-text-secondary; }
+}
+
 // ── Foot ─────────────────────────────────────
 .chat-foot {
-  padding: 16px 20px;
-  border-top: 1px solid $color-steel;
-  background: $color-sheet;
+  padding: 12px 16px 20px;
+  border-top: 1px solid $color-border-light;
+  background: $color-bg;
 }
 
 .input-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .chat-input {
   flex: 1;
-  height: 42px;
-  padding: 0 16px;
-  font-size: 14px;
-  font-family: $font-body;
-  color: $color-carbon;
-  background: #F5F3F0;
+  height: 40px;
+  padding: 0 18px;
+  font-size: $font-size-base;
+  font-family: $font-family;
+  color: $color-text-primary;
+  background: $color-bg-secondary;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 20px;
   outline: none;
-  transition: border-color $transition-fast, background $transition-fast;
+  letter-spacing: -0.01em;
+  transition: all $transition-fast;
 
   &:focus {
-    background: $color-sheet;
-    border-color: $color-cobalt;
+    background: $color-bg;
+    border-color: $color-accent;
   }
 
   &::placeholder {
-    color: #B0B4BA;
+    color: $color-text-tertiary;
   }
 
   &:disabled {
@@ -504,21 +492,21 @@ onUnmounted(() => {
 }
 
 .send-btn {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  background: $color-cobalt;
-  color: $color-sheet;
-  border-radius: 8px;
+  background: $color-accent;
+  color: #fff;
+  border-radius: 50%;
   cursor: pointer;
   flex-shrink: 0;
   transition: opacity $transition-fast;
 
   &:hover:not(:disabled) {
-    opacity: 0.88;
+    opacity: 0.85;
   }
 
   &:disabled {
@@ -528,29 +516,28 @@ onUnmounted(() => {
 }
 
 .stop-btn {
-  height: 42px;
+  height: 40px;
   padding: 0 18px;
-  border: 1px solid $color-iron-red;
+  border: 1px solid $color-danger;
   background: transparent;
-  color: $color-iron-red;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: $font-body;
+  color: $color-danger;
+  border-radius: 20px;
+  font-size: $font-size-sm;
+  font-family: $font-family;
   cursor: pointer;
   flex-shrink: 0;
   transition: all $transition-fast;
 
   &:hover {
-    background: $color-iron-red;
-    color: $color-sheet;
+    background: $color-danger;
+    color: #fff;
   }
 }
 
 // ── Dark Mode ────────────────────────────────
 html.dark {
   .chat-panel {
-    background: $dark-bg-secondary;
-    border-color: $dark-border;
+    background: $dark-bg;
   }
 
   .chat-top {
@@ -558,11 +545,6 @@ html.dark {
 
     &__title {
       color: $dark-text;
-    }
-
-    &__clear {
-      border-color: $dark-border;
-      color: $dark-text-secondary;
     }
   }
 
@@ -574,69 +556,50 @@ html.dark {
     color: $dark-text;
   }
 
-  .prompt-chip {
-    color: $dark-text-secondary;
-    background: $dark-bg-secondary;
-    border-color: $dark-border;
-
-    &:hover {
-      border-color: $color-cobalt;
-      color: $color-cobalt;
-    }
+  .msg-bubble.bubble--bot {
+    background: #2c2c2e;
+    color: $dark-text;
   }
 
-  .msg-bubble.bubble--bot {
-    background: $dark-bg-secondary;
-    border-color: $dark-border;
-    color: $dark-text;
+  .prompt-chip {
+    border-color: $color-accent;
+    color: $color-accent;
+    background: transparent;
+
+    &:hover {
+      background: $color-accent;
+      color: #fff;
+    }
   }
 
   .md-content {
     :deep(th) { background: rgba(255,255,255,0.06); border-bottom-color: rgba(255,255,255,0.1); }
     :deep(td) { border-bottom-color: rgba(255,255,255,0.06); }
-    :deep(code) { background: rgba(255,255,255,0.08); }
+    :deep(code) { background: rgba(255,255,255,0.1); }
     :deep(pre) { background: rgba(255,255,255,0.04); }
     :deep(hr) { border-top-color: rgba(255,255,255,0.1); }
-    :deep(blockquote) { color: $dark-text-secondary; }
   }
 
   .chat-foot {
     border-top-color: $dark-border;
-    background: $dark-bg-secondary;
+    background: $dark-bg;
   }
 
   .chat-input {
-    background: $dark-bg;
+    background: $dark-bg-secondary;
     color: $dark-text;
 
     &:focus {
       background: $dark-bg-secondary;
-      border-color: $color-cobalt;
-    }
-  }
-
-  .stop-btn {
-    border-color: $color-iron-red;
-
-    &:hover {
-      background: $color-iron-red;
+      border-color: $color-accent;
     }
   }
 }
 
 // ── Responsive ───────────────────────────────
 @media (max-width: 640px) {
-  .ai-chat-page {
-    padding: 0;
-  }
-
-  .chat-panel {
-    border-radius: 0;
-    border: none;
-  }
-
   .msg-row {
-    max-width: 90%;
+    max-width: 88%;
   }
 }
 </style>

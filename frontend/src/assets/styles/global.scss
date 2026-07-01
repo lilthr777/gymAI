@@ -1,39 +1,41 @@
 @use './variables.scss' as *;
 
 // ============================================
-// Element Plus CSS Variable Overrides
+// Element Plus CSS Variable Overrides (Apple palette)
 // ============================================
 :root {
-  --el-color-primary: #{$color-cobalt};
-  --el-color-primary-light-3: #{$color-cobalt-light};
-  --el-color-primary-light-5: #85ADD9;
-  --el-color-primary-light-7: #B0CCE8;
-  --el-color-primary-light-8: #C8DCF0;
-  --el-color-primary-light-9: #E0ECF7;
-  --el-color-primary-dark-2: #{$color-cobalt-dark};
-  --el-color-success: #5C9A4F;
-  --el-color-warning: #D4953B;
-  --el-color-danger: #{$color-iron-red};
-  --el-color-info: #{$color-lead};
+  --el-color-primary: #{$color-accent};
+  --el-color-primary-light-3: #3394e8;
+  --el-color-primary-light-5: #66b0f0;
+  --el-color-primary-light-7: #99ccf5;
+  --el-color-primary-light-8: #b3d9f8;
+  --el-color-primary-light-9: #cce6fa;
+  --el-color-primary-dark-2: #0066cc;
+  --el-color-success: #{$color-success};
+  --el-color-warning: #{$color-warning};
+  --el-color-danger: #{$color-danger};
+  --el-color-info: #{$color-text-secondary};
 
-  --el-bg-color: #{$color-magnesium};
-  --el-bg-color-overlay: #{$color-sheet};
-  --el-bg-color-page: #{$color-magnesium};
-  --el-border-color: #{$color-steel};
-  --el-border-color-light: #E8E4DF;
-  --el-border-color-lighter: #EFECE7;
-  --el-text-color-primary: #{$color-carbon};
-  --el-text-color-regular: #{$color-ash};
-  --el-text-color-secondary: #{$color-lead};
-  --el-text-color-placeholder: #9B9EA3;
+  --el-bg-color: #{$color-bg};
+  --el-bg-color-overlay: #{$color-bg};
+  --el-bg-color-page: #{$color-bg};
+  --el-border-color: #{$color-border};
+  --el-border-color-light: #{$color-border-light};
+  --el-border-color-lighter: #f0f0f2;
+  --el-text-color-primary: #{$color-text-primary};
+  --el-text-color-regular: #{$color-text-primary};
+  --el-text-color-secondary: #{$color-text-secondary};
+  --el-text-color-placeholder: #{$color-text-tertiary};
 
   --el-border-radius-base: #{$radius-md};
   --el-border-radius-small: #{$radius-sm};
-  --el-border-radius-round: 20px;
-  --el-box-shadow-light: 0 1px 3px rgba(26, 29, 32, 0.06);
-  --el-box-shadow: 0 2px 8px rgba(26, 29, 32, 0.08);
+  --el-border-radius-round: #{$radius-pill};
+  --el-box-shadow-light: #{$shadow-sm};
+  --el-box-shadow: #{$shadow-md};
+  --el-box-shadow-dark: #{$shadow-lg};
 
-  --el-font-family: #{$font-body};
+  --el-font-family: #{$font-family};
+  --el-font-size-base: #{$font-size-base};
 }
 
 // ============================================
@@ -51,28 +53,38 @@ html,
 body,
 #app {
   height: 100%;
-  font-family: $font-body;
+  font-family: $font-family;
   font-size: $font-size-base;
-  color: $color-carbon;
-  background-color: $color-magnesium;
+  color: $color-text-primary;
+  background-color: $color-bg;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
 }
 
 // ============================================
-// Scrollbar
+// Apple-style selection
+// ============================================
+::selection {
+  background: rgba($color-accent, 0.2);
+  color: $color-text-primary;
+}
+
+// ============================================
+// Scrollbar — thin Apple-style
 // ============================================
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C4C0B8;
-  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 980px;
 
   &:hover {
-    background: #A8A49C;
+    background: rgba(0, 0, 0, 0.25);
   }
 }
 
@@ -99,58 +111,113 @@ body,
 // Element Plus Fine-tune Overrides
 // ============================================
 
-// Buttons — less rounded, cleaner
+// Buttons — Apple-style
 .el-button {
   font-weight: 500;
-  letter-spacing: 0.01em;
-}
+  letter-spacing: -0.01em;
+  border-radius: $radius-pill;
 
-// Menu items in sidebar
-.el-menu {
-  --el-menu-bg-color: transparent;
-  --el-menu-text-color: #9B9EA3;
-  --el-menu-hover-bg-color: rgba(255, 255, 255, 0.04);
-  --el-menu-active-color: #{$color-sheet};
-}
+  &.el-button--primary {
+    background: $color-accent;
+    border-color: $color-accent;
 
-// Table — tighter header
-.el-table {
-  th.el-table__cell {
-    font-weight: 500;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: $color-lead;
+    &:hover {
+      background: $color-accent-hover;
+      border-color: $color-accent-hover;
+    }
+  }
+
+  &.el-button--large {
+    font-size: $font-size-base;
+    height: 48px;
+    padding: 0 32px;
   }
 }
 
-// Dialog — less padding bloat
-.el-dialog {
-  --el-dialog-padding-primary: 24px;
+// Links — Apple-style blue text
+a {
+  color: $color-accent;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
-.el-dialog__header {
-  font-weight: 600;
-  font-size: 16px;
+// Input fields
+.el-input {
+  --el-input-focus-border-color: #{$color-accent};
+  --el-input-border-color: #{$color-border};
+
+  .el-input__wrapper {
+    border-radius: $radius-md;
+    box-shadow: 0 0 0 1px $color-border inset;
+
+    &:hover {
+      box-shadow: 0 0 0 1px $color-border inset;
+    }
+
+    &.is-focus {
+      box-shadow: 0 0 0 2px $color-accent inset;
+    }
+  }
+}
+
+// Tags
+.el-tag {
+  font-weight: 500;
+  border-radius: $radius-pill;
 }
 
 // Card
 .el-card {
-  --el-card-border-color: #{$color-steel};
+  --el-card-border-color: #{$color-border};
+  border-radius: $radius-lg;
+  box-shadow: none;
 }
 
-// Tags — slightly smaller
-.el-tag {
-  font-weight: 500;
+// Dialog
+.el-dialog {
+  --el-dialog-padding-primary: 32px;
+  border-radius: $radius-lg;
 }
 
-// Input — tighter focus ring
-.el-input {
-  --el-input-focus-border-color: #{$color-cobalt};
+.el-dialog__header {
+  font-weight: 600;
+  font-size: $font-size-lg;
+}
+
+// Empty state
+.el-empty {
+  padding: 60px 0;
+}
+
+.el-empty__description p {
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+}
+
+// Table
+.el-table {
+  th.el-table__cell {
+    font-weight: 500;
+    font-size: $font-size-xs;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: $color-text-secondary;
+  }
+}
+
+// Menu
+.el-menu {
+  --el-menu-bg-color: transparent;
+  --el-menu-text-color: #{$color-text-secondary};
+  --el-menu-hover-bg-color: rgba(0, 0, 0, 0.04);
+  --el-menu-active-color: #{$color-accent};
 }
 
 // ============================================
-// Dark Mode
+// Dark Mode — True Black Apple-style
 // ============================================
 html.dark {
   color: $dark-text;
@@ -160,23 +227,34 @@ html.dark {
     background-color: $dark-bg;
   }
 
-  // Element Plus dark overrides
   --el-bg-color: #{$dark-bg};
   --el-bg-color-overlay: #{$dark-bg-secondary};
   --el-bg-color-page: #{$dark-bg};
   --el-border-color: #{$dark-border};
-  --el-border-color-light: #353840;
-  --el-border-color-lighter: #2E3138;
+  --el-border-color-light: #{$dark-border-secondary};
+  --el-border-color-lighter: #2c2c2e;
   --el-text-color-primary: #{$dark-text};
-  --el-text-color-regular: #C5C0B8;
+  --el-text-color-regular: #{$dark-text};
   --el-text-color-secondary: #{$dark-text-secondary};
-  --el-text-color-placeholder: #6B6E73;
-  --el-box-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --el-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --el-text-color-placeholder: #636366;
+  --el-box-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --el-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --el-box-shadow-dark: 0 4px 16px rgba(0, 0, 0, 0.6);
 
-  --el-color-primary-light-9: rgba(59, 110, 176, 0.15);
+  --el-color-primary-light-9: rgba(0, 113, 227, 0.15);
 
-  // Table dark
+  .el-input .el-input__wrapper {
+    box-shadow: 0 0 0 1px $dark-border inset;
+
+    &:hover {
+      box-shadow: 0 0 0 1px $dark-border inset;
+    }
+
+    &.is-focus {
+      box-shadow: 0 0 0 2px $color-accent inset;
+    }
+  }
+
   .el-table {
     --el-table-bg-color: #{$dark-bg-secondary};
     --el-table-tr-bg-color: #{$dark-bg-secondary};
@@ -206,6 +284,19 @@ html.dark {
   }
 
   .el-popper.is-dark {
+    color: $dark-text;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+  }
+
+  ::selection {
+    background: rgba($color-accent, 0.3);
     color: $dark-text;
   }
 }

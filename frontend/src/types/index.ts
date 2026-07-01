@@ -26,6 +26,7 @@ export interface User {
   cardStartDate?: string
   cardEndDate?: string
   status: number
+  createdAt?: string
 }
 
 // 教练

@@ -1,6 +1,6 @@
 <template>
   <div class="app-layout">
-    <!-- 顶部导航 -->
+    <!-- Top navigation — frosted glass -->
     <header class="topbar">
       <div class="topbar-left">
         <span class="topbar-brand">gymAI</span>
@@ -23,12 +23,12 @@
       </div>
     </header>
 
-    <!-- 内容区 -->
+    <!-- Content area -->
     <main class="main-content">
       <router-view />
     </main>
 
-    <!-- 底部导航栏 -->
+    <!-- Bottom tab bar -->
     <nav v-if="showTabBar" class="tabbar">
       <div
         v-for="tab in tabs"
@@ -37,7 +37,7 @@
         :class="{ active: isTabActive(tab) }"
         @click="router.push(tab.path)"
       >
-        <el-icon :size="20"><component :is="tab.icon" /></el-icon>
+        <el-icon :size="22"><component :is="tab.icon" /></el-icon>
         <span class="tabbar-label">{{ tab.label }}</span>
       </div>
     </nav>
@@ -58,9 +58,7 @@ const userStore = useUserStore()
 
 const tabs = [
   { path: '/home', label: '首页', icon: 'HomeFilled' },
-  { path: '/courses', label: '课程', icon: 'Calendar' },
-  { path: '/coaches', label: '教练', icon: 'Avatar' },
-  { path: '/ai-chat', label: 'AI助手', icon: 'ChatDotRound' },
+  { path: '/ai-chat', label: 'AI', icon: 'ChatDotRound' },
   { path: '/profile', label: '我的', icon: 'User' },
 ]
 
@@ -68,9 +66,7 @@ const showTabBar = computed(() => route.meta.showTabBar !== false)
 
 const isTabActive = (tab: { path: string }) => {
   if (tab.path === '/home') return route.path === '/home'
-  if (tab.path === '/courses') return route.path.startsWith('/courses')
-  if (tab.path === '/coaches') return route.path.startsWith('/coaches')
-  if (tab.path === '/profile') return ['/profile', '/my-courses', '/my-checkins'].includes(route.path)
+  if (tab.path === '/profile') return ['/profile', '/my-courses', '/my-checkins', '/card', '/edit-profile'].includes(route.path)
   return route.path === tab.path
 }
 
@@ -86,33 +82,38 @@ const handleLogout = () => {
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  position: relative;
 }
 
-// ── Topbar ───────────────────────────────────
+// ── Topbar — Apple frosted glass (fixed overlay) ──
 .topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  background: $color-sheet;
-  border-bottom: 1px solid $color-steel;
-  flex-shrink: 0;
-  z-index: 10;
+  padding: 0 20px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  z-index: 100;
 }
 
 .topbar-brand {
-  font-family: $font-display;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: $color-carbon;
+  letter-spacing: -0.02em;
+  color: $color-text-primary;
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .theme-toggle {
@@ -123,13 +124,13 @@ const handleLogout = () => {
   justify-content: center;
   border: none;
   background: transparent;
-  color: $color-lead;
+  color: $color-text-secondary;
   cursor: pointer;
-  border-radius: $radius-md;
+  border-radius: 50%;
   transition: color $transition-fast;
 
   &:hover {
-    color: $color-cobalt;
+    color: $color-accent;
   }
 }
 
@@ -144,28 +145,35 @@ const handleLogout = () => {
   transition: box-shadow $transition-fast;
 
   &:hover {
-    box-shadow: 0 0 0 2px $color-steel;
+    box-shadow: 0 0 0 2px $color-border;
   }
 }
 
-// ── Content ──────────────────────────────────
+// ── Content (scrolls under frosted bars) ───
 .main-content {
   flex: 1;
   overflow-y: auto;
-  background: $color-magnesium;
-  padding-bottom: 0;
+  background: $color-bg;
+  padding-top: 48px;
+  padding-bottom: 50px;
 }
 
-// ── TabBar ───────────────────────────────────
+// ── TabBar — iOS-style fixed bottom ─────────
 .tabbar {
-  height: 56px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  background: $color-sheet;
-  border-top: 1px solid $color-steel;
-  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
   padding-bottom: env(safe-area-inset-bottom, 0);
+  z-index: 100;
 }
 
 .tabbar-item {
@@ -173,34 +181,34 @@ const handleLogout = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
   flex: 1;
   height: 100%;
   cursor: pointer;
-  color: $color-lead;
+  color: $color-text-tertiary;
   transition: color $transition-fast;
-  padding: 4px 0;
 
   &:hover {
-    color: $color-cobalt-light;
+    color: $color-text-secondary;
   }
 
   &.active {
-    color: $color-cobalt;
+    color: $color-accent;
   }
 }
 
 .tabbar-label {
   font-size: 10px;
-  font-family: $font-body;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   line-height: 1;
 }
 
-// ── Dark Mode ────────────────────────────────
+// ── Dark Mode ───────────────────────────────
 html.dark {
   .topbar {
-    background: $dark-bg-secondary;
-    border-bottom-color: $dark-border;
+    background: rgba(28, 28, 30, 0.72);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
   }
 
   .topbar-brand {
@@ -212,8 +220,8 @@ html.dark {
   }
 
   .tabbar {
-    background: $dark-bg-secondary;
-    border-top-color: $dark-border;
+    background: rgba(28, 28, 30, 0.72);
+    border-top-color: rgba(255, 255, 255, 0.08);
   }
 }
 </style>

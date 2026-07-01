@@ -1,52 +1,88 @@
 // ============================================
-// gymAI Design Tokens — "Iron & Rhythm"
+// gymAI Design Tokens — Apple-style
 // ============================================
 
 // ── Palette ─────────────────────────────────
-$color-carbon: #1A1D20;
-$color-magnesium: #F2EFEA;
-$color-cobalt: #3B6EB0;
-$color-cobalt-light: #5B8EC8;
-$color-cobalt-dark: #2F5890;
-$color-iron-red: #C4523D;
-$color-lead: #6B6E73;
-$color-steel: #D9D5CE;
-$color-sheet: #FFFFFF;
-$color-rubber: #25282C;
-$color-ash: #3A3D40;
+$color-bg: #ffffff;
+$color-bg-secondary: #f5f5f7;
+$color-text-primary: #1d1d1f;
+$color-text-secondary: #86868b;
+$color-text-tertiary: #aeaeb2;
+$color-accent: #0071e3;
+$color-accent-hover: #0077ed;
+$color-danger: #ff3b30;
+$color-success: #34c759;
+$color-warning: #ff9500;
+$color-border: #d2d2d7;
+$color-border-light: #e5e5ea;
+$color-separator: #e4e4e9;
+
+// Keep old names as aliases for backward compat in Element Plus overrides
+$color-carbon: #{$color-text-primary};
+$color-magnesium: #{$color-bg-secondary};
+$color-cobalt: #{$color-accent};
+$color-cobalt-light: #{$color-accent-hover};
+$color-cobalt-dark: #0066cc;
+$color-iron-red: #{$color-danger};
+$color-lead: #{$color-text-secondary};
+$color-steel: #{$color-border};
+$color-sheet: #{$color-bg};
+$color-rubber: #{$color-bg-secondary};
+$color-ash: #{$color-text-tertiary};
 
 // ── Dark mode palette ───────────────────────
-$dark-bg: #{$color-carbon};
-$dark-bg-secondary: #{$color-rubber};
-$dark-bg-card: #2A2D32;
-$dark-text: #E8E4DF;
-$dark-text-secondary: #9B9EA3;
-$dark-border: #3A3D42;
+$dark-bg: #000000;
+$dark-bg-secondary: #1c1c1e;
+$dark-bg-card: #1c1c1e;
+$dark-text: #f5f5f7;
+$dark-text-secondary: #98989d;
+$dark-border: #38383a;
+$dark-border-secondary: #2c2c2e;
 
 // ── Typography ──────────────────────────────
-$font-display: 'Oswald', 'Impact', sans-serif;
-$font-body: 'Inter', -apple-system, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-$font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
-$font-size-base: 14px;
-$font-size-sm: 12px;
-$font-size-lg: 16px;
-$font-size-xl: 20px;
+$font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+$font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "PingFang SC", sans-serif;
+$font-body: $font-family;
+$font-mono: "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
+
+$font-size-xs: 12px;
+$font-size-sm: 14px;
+$font-size-base: 17px;
+$font-size-lg: 19px;
+$font-size-xl: 21px;
 $font-size-2xl: 28px;
 $font-size-3xl: 40px;
+$font-size-4xl: 48px;
+$font-size-5xl: 64px;
+
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
 
 // ── Layout ──────────────────────────────────
 $sidebar-width: 240px;
 $sidebar-collapsed-width: 64px;
-$header-height: 56px;
+$header-height: 48px;
 $content-padding: 24px;
+$section-padding: 40px;
 $gap-unit: 24px;
+$hero-padding: 80px;
 
 // ── Radii ───────────────────────────────────
-$radius-sm: 4px;
-$radius-md: 6px;
-$radius-lg: 10px;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 20px;
+$radius-pill: 980px;
 
 // ── Transitions ─────────────────────────────
 $transition-fast: 0.15s ease;
 $transition-base: 0.25s ease;
 $transition-slow: 0.4s ease;
+
+// ── Shadows ─────────────────────────────────
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);

@@ -1,8 +1,16 @@
 <template>
   <div class="course-browse">
-    <el-input v-model="keyword" placeholder="搜索课程" clearable class="search-bar" @input="search">
-      <template #prefix><el-icon><Search /></el-icon></template>
-    </el-input>
+    <div class="page-nav">
+      <button class="back-btn" @click="$router.back()">
+        <el-icon :size="20"><ArrowLeft /></el-icon>
+      </button>
+    </div>
+
+    <div class="search-wrap">
+      <el-input v-model="keyword" placeholder="搜索课程" clearable class="search-bar" @input="search">
+        <template #prefix><el-icon><Search /></el-icon></template>
+      </el-input>
+    </div>
 
     <div class="filter-row">
       <button v-for="f in filters" :key="f.key" class="filter-btn" :class="{ active: activeFilter === f.key }" @click="activeFilter = f.key">
@@ -10,19 +18,21 @@
       </button>
     </div>
 
-    <CourseCard v-for="c in filteredList" :key="c.id" :course="c" @click="$router.push(`/courses/${c.id}`)" />
+    <div class="list-area">
+      <CourseCard v-for="c in filteredList" :key="c.id" :course="c" @click="$router.push(`/courses/${c.id}`)" />
+    </div>
 
     <el-empty v-if="!loading && !filteredList.length" description="暂无课程" />
 
     <div v-if="total > courseList.length" class="load-more">
-      <el-button :loading="loading" @click="loadMore">加载更多</el-button>
+      <el-button :loading="loading" size="large" class="more-btn" @click="loadMore">加载更多</el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Search } from '@element-plus/icons-vue'
+import { Search, ArrowLeft } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { courseApi } from '@/api'
 import type { Course } from '@/types'
@@ -69,23 +79,129 @@ onMounted(() => fetchList())
 </script>
 
 <style scoped lang="scss">
-.course-browse { padding: 16px; }
-
-.search-bar { margin-bottom: 12px; :deep(.el-input__wrapper) { border-radius: 20px; } }
-
-.filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
-
-.filter-btn {
-  padding: 6px 16px; border: 1px solid $color-steel; background: $color-sheet; border-radius: 20px;
-  font-size: $font-size-sm; color: $color-lead; cursor: pointer; transition: all $transition-fast; font-family: $font-body;
-  &:hover { border-color: $color-cobalt; color: $color-cobalt; }
-  &.active { background: $color-cobalt; color: #fff; border-color: $color-cobalt; }
+.course-browse {
+  padding: 24px 20px;
+  max-width: 680px;
+  margin: 0 auto;
 }
 
-.load-more { text-align: center; padding: 16px; }
+.page-nav {
+  margin-bottom: 12px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: $color-accent;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba($color-accent, 0.08);
+  }
+}
+
+.search-wrap {
+  margin-bottom: 16px;
+
+  :deep(.el-input__wrapper) {
+    border-radius: $radius-md;
+    background: $color-bg-secondary;
+    border: none;
+    box-shadow: none;
+    padding: 4px 16px;
+    height: 44px;
+
+    &:hover {
+      background: #f0f0f2;
+      box-shadow: none;
+    }
+
+    &.is-focus {
+      background: $color-bg;
+      box-shadow: 0 0 0 2px $color-accent inset;
+    }
+  }
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.filter-btn {
+  padding: 6px 18px;
+  border: none;
+  background: $color-bg-secondary;
+  border-radius: $radius-pill;
+  font-size: $font-size-sm;
+  font-family: $font-family;
+  color: $color-text-primary;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all $transition-fast;
+  font-weight: 500;
+
+  &:hover {
+    background: #e8e8ed;
+  }
+
+  &.active {
+    background: $color-text-primary;
+    color: $color-bg;
+  }
+}
+
+.list-area {
+  background: $color-bg;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border-light;
+  overflow: hidden;
+}
+
+.load-more {
+  text-align: center;
+  padding: 24px 0;
+}
+
+.more-btn {
+  border-radius: $radius-pill;
+  font-weight: 500;
+}
 
 html.dark {
-  .filter-btn { background: $dark-bg-card; border-color: $dark-border; color: $dark-text-secondary; }
-  .filter-btn.active { background: $color-cobalt; color: #fff; border-color: $color-cobalt; }
+  .search-wrap :deep(.el-input__wrapper) {
+    background: $dark-bg-secondary;
+    color: $dark-text;
+
+    &.is-focus {
+      background: $dark-bg-secondary;
+    }
+  }
+
+  .filter-btn {
+    background: $dark-bg-secondary;
+    color: $dark-text;
+
+    &.active {
+      background: $dark-text;
+      color: $dark-bg;
+    }
+  }
+
+  .list-area {
+    background: $dark-bg;
+    border-color: $dark-border;
+  }
 }
 </style>

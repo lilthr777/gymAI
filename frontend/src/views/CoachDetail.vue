@@ -1,16 +1,20 @@
 <template>
   <div class="coach-detail" v-if="coach">
     <div class="page-nav">
-      <el-button text @click="$router.back()"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+      <button class="back-btn" @click="$router.back()">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+        <span>返回</span>
+      </button>
     </div>
+
     <div class="coach-hero">
-      <el-avatar :size="72" icon="UserFilled" :src="coach.avatar" />
+      <el-avatar :size="96" icon="UserFilled" :src="coach.avatar" />
       <h2>{{ coach.name }}</h2>
       <button v-if="userStore.isLoggedIn()" class="fav-btn" :class="{ favorited }" @click="toggleFav">
         {{ favorited ? '♥' : '♡' }}
       </button>
       <div class="coach-tags">
-        <el-tag v-for="tag in tags" :key="tag" size="small" type="info">{{ tag }}</el-tag>
+        <span v-for="tag in tags" :key="tag" class="tag">{{ tag }}</span>
       </div>
     </div>
 
@@ -20,12 +24,14 @@
 
     <section class="section">
       <h3>该教练课程</h3>
-      <CourseCard
-        v-for="course in courses"
-        :key="course.id"
-        :course="course"
-        @click="$router.push(`/courses/${course.id}`)"
-      />
+      <div class="course-list">
+        <CourseCard
+          v-for="course in courses"
+          :key="course.id"
+          :course="course"
+          @click="$router.push(`/courses/${course.id}`)"
+        />
+      </div>
       <el-empty v-if="!courses.length" description="暂无课程" />
     </section>
   </div>
@@ -59,6 +65,7 @@ const checkFav = async (id: number) => {
     favorited.value = res.data.includes(id)
   } catch { /* handled */ }
 }
+
 const courses = ref<Course[]>([])
 
 const tags = computed(() => {
@@ -84,61 +91,113 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .coach-detail {
-  padding: 16px;
+  padding: 24px 20px;
+  max-width: 680px;
+  margin: 0 auto;
 }
 
 .page-nav {
-  margin-bottom: 12px;
+  margin-bottom: 24px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: $color-accent;
+  font-size: $font-size-base;
+  font-family: $font-family;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .coach-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 0;
+  padding: 40px 0 32px;
   position: relative;
 
   h2 {
-    font-size: 22px;
-    font-weight: 600;
-    color: $color-carbon;
-    margin: 12px 0 8px;
+    font-size: $font-size-2xl;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: $color-text-primary;
+    margin: 20px 0 12px;
   }
 }
 
-.fav-btn { border: none; background: none; font-size: 22px; cursor: pointer; color: #ccc; position: absolute; top: 8px; right: 8px; transition: color 0.2s;
-  &:hover { color: #e74c3c; }
-  &.favorited { color: #e74c3c; }
+.fav-btn {
+  border: none;
+  background: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: $color-border;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $color-danger;
+  }
+
+  &.favorited {
+    color: $color-danger;
+  }
 }
 
 .coach-tags {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
   justify-content: center;
 }
 
+.tag {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  background: $color-bg-secondary;
+  padding: 4px 12px;
+  border-radius: $radius-pill;
+  font-weight: 500;
+}
+
 .coach-desc {
-  padding: 16px;
-  background: $color-sheet;
+  padding: 24px;
+  background: $color-bg;
+  border: 1px solid $color-border-light;
   border-radius: $radius-lg;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 
   p {
-    font-size: 14px;
-    color: $color-ash;
+    font-size: $font-size-base;
+    color: $color-text-primary;
     line-height: 1.6;
-    margin: 0;
   }
 }
 
 .section {
   h3 {
-    font-size: 17px;
+    font-size: $font-size-xl;
     font-weight: 600;
-    color: $color-carbon;
-    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+    color: $color-text-primary;
+    margin: 0 0 16px;
   }
+}
+
+.course-list {
+  background: $color-bg;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-lg;
+  overflow: hidden;
 }
 
 html.dark {
@@ -148,11 +207,21 @@ html.dark {
   }
 
   .coach-desc {
-    background: $dark-bg-card;
+    background: $dark-bg-secondary;
+    border-color: $dark-border;
+
+    p {
+      color: $dark-text;
+    }
   }
 
-  .coach-desc p {
-    color: $dark-text-secondary;
+  .tag {
+    background: $dark-bg-secondary;
+  }
+
+  .course-list {
+    background: $dark-bg;
+    border-color: $dark-border;
   }
 }
 </style>

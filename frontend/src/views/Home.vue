@@ -1,80 +1,91 @@
 <template>
   <div class="home-page">
-    <div v-if="userStore.isLoggedIn()" class="welcome-card">
-      <p class="greeting">{{ greeting }}，{{ userStore.nickname }}</p>
-      <div class="stats-row">
-        <div class="stat-item">
-          <span class="stat-num">{{ homeData.myCourseCount }}</span>
-          <span class="stat-label">我的课程</span>
+    <!-- ======== Logged-in Hero ======== -->
+    <div v-if="userStore.isLoggedIn()" class="hero">
+      <p class="hero-greet">{{ greeting }}，{{ userStore.nickname }}</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-num">{{ homeData.myCourseCount }}</span>
+          <span class="hero-label">我的课程</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-num">{{ homeData.monthCheckins }}</span>
-          <span class="stat-label">本月签到</span>
+        <div class="hero-stat">
+          <span class="hero-num">{{ homeData.monthCheckins }}</span>
+          <span class="hero-label">本月签到</span>
         </div>
       </div>
-      <!-- 会员卡条移入 Hero -->
-      <div v-if="homeData.card?.cardType" class="card-strip" @click="$router.push('/card')">
-        <div class="strip-left">
+      <!-- Membership strip -->
+      <div v-if="homeData.card?.cardType" class="hero-card-strip" @click="$router.push('/card')">
+        <div class="strip-info">
           <span class="strip-type">{{ cardLabel }}</span>
           <span class="strip-days" :class="{ warn: cardRemaining <= 7 }">
             {{ cardRemaining <= 0 ? '已过期' : '剩余 ' + cardRemaining + ' 天' }}
           </span>
         </div>
-        <div class="strip-right">
-          <div class="strip-progress">
-            <div class="strip-bar" :style="{ width: cardProgress + '%' }" :class="{ warn: cardRemaining <= 7 }"></div>
+        <div class="strip-bar">
+          <div class="strip-fill" :style="{ width: cardProgress + '%' }" :class="{ warn: cardRemaining <= 7 }"></div>
+        </div>
+      </div>
+      <!-- Upcoming courses -->
+      <div v-if="upcomingMyCourses.length" class="hero-next">
+        <p class="next-title">即将开始</p>
+        <div v-for="c in upcomingMyCourses" :key="c.id" class="hero-next-item" @click="$router.push(`/courses/${c.id}`)">
+          <span class="dot"></span>
+          <span class="next-name">{{ c.name }}</span>
+          <span class="next-time">{{ c.courseDate?.slice(5) }} {{ c.startTime?.slice(0, 5) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== Guest Hero ======== -->
+    <div v-else class="hero hero-guest">
+      <h2 class="guest-title">gymAI</h2>
+      <p class="guest-sub">你的专属健身伙伴</p>
+      <div class="guest-actions">
+        <span class="guest-link" @click="$router.push('/login')">登录</span>
+        <span class="guest-sep">&nbsp;&middot;&nbsp;</span>
+        <span class="guest-link" @click="$router.push('/register')">注册</span>
+      </div>
+    </div>
+
+    <!-- ======== Course Module ======== -->
+    <section class="module">
+      <div class="module-head">
+        <h3>课程</h3>
+        <span class="module-more" @click="$router.push('/courses')">查看全部 &rarr;</span>
+      </div>
+      <div class="module-body">
+        <div class="module-tabs">
+          <button :class="{ active: courseTab === 'my' }" @click="courseTab = 'my'">我的</button>
+          <button :class="{ active: courseTab === 'all' }" @click="courseTab = 'all'">全部课程</button>
+        </div>
+        <template v-if="courseTab === 'my'">
+          <template v-if="homeData.myCourses?.length">
+            <CourseCard v-for="c in homeData.myCourses.slice(0, 4)" :key="c.id" :course="c" @click="goDetail(c.id)" />
+          </template>
+          <div v-else class="module-empty">
+            <p>还没有报名的课程</p>
+            <span class="module-empty-link" @click="courseTab = 'all'">去看看全部课程 &rarr;</span>
           </div>
-          <span class="strip-arrow">&rsaquo;</span>
-        </div>
-      </div>
-
-      <!-- 近期课程提醒 -->
-      <div v-if="upcomingMyCourses.length" class="upcoming-strip">
-        <div v-for="c in upcomingMyCourses" :key="c.id" class="upcoming-item" @click="$router.push(`/courses/${c.id}`)">
-          <span class="up-dot"></span>
-          <span class="up-name">{{ c.name }}</span>
-          <span class="up-time">{{ c.courseDate?.slice(5) }} {{ c.startTime?.slice(0, 5) }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div v-else class="welcome-card">
-      <h2>欢迎来到 gymAI</h2>
-      <p class="welcome-desc">注册/登录后开始你的健身之旅</p>
-      <el-button type="primary" size="large" class="cta-btn" @click="$router.push('/login')">立即登录</el-button>
-    </div>
-
-    <!-- 我的课程 -->
-    <section v-if="userStore.isLoggedIn() && homeData.myCourses?.length" class="section">
-      <div class="section-header">
-        <h3>我的课程</h3>
-        <span class="more-link" @click="$router.push('/my-courses')">全部</span>
-      </div>
-      <CourseCard v-for="c in homeData.myCourses" :key="c.id" :course="c" @click="goDetail(c.id)" />
-    </section>
-
-    <section class="section">
-      <div class="section-header">
-        <h3>推荐课程</h3>
-        <span class="more-link" @click="$router.push('/courses')">全部</span>
-      </div>
-      <CourseCard v-for="c in homeData.upcomingCourses" :key="c.id" :course="c" @click="goDetail(c.id)" />
-      <div v-if="!homeData.upcomingCourses?.length" class="empty-box">
-        <span class="empty-emoji">📅</span>
-        <p>还没有课程</p>
-        <router-link to="/courses" class="empty-link">去看看有什么好课</router-link>
+        </template>
+        <template v-else>
+          <template v-if="homeData.upcomingCourses?.length">
+            <CourseCard v-for="c in homeData.upcomingCourses.slice(0, 6)" :key="c.id" :course="c" @click="goDetail(c.id)" />
+          </template>
+          <div v-else class="module-empty">
+            <p>暂无课程安排</p>
+          </div>
+        </template>
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-header">
-        <h3>推荐教练</h3>
-        <span class="more-link" @click="$router.push('/coaches')">全部</span>
+    <!-- ======== Coach Module ======== -->
+    <section class="module">
+      <div class="module-head">
+        <h3>教练团队</h3>
+        <span class="module-more" @click="$router.push('/coaches')">查看全部 &rarr;</span>
       </div>
-      <CoachCard v-for="c in homeData.coaches" :key="c.id" :coach="c" @click="router.push(`/coaches/${c.id}`)" />
-      <div v-if="!homeData.coaches?.length" class="empty-box">
-        <span class="empty-emoji">👨‍🏫</span>
-        <p>暂无教练信息</p>
+      <div class="module-body">
+        <CoachCard v-for="c in homeData.coaches" :key="c.id" :coach="c" @click="router.push(`/coaches/${c.id}`)" />
       </div>
     </section>
   </div>
@@ -95,6 +106,8 @@ const userStore = useUserStore()
 const homeData = ref<HomeData>({
   myCourseCount: 0, monthCheckins: 0, checkinDates: [], myCourses: [], upcomingCourses: [], coaches: [], card: {},
 })
+
+const courseTab = ref('my')
 
 const greeting = computed(() => {
   const h = new Date().getHours()
@@ -120,7 +133,6 @@ const cardProgress = computed(() => {
   return Math.min(100, Math.max(0, Math.round(((Date.now() - start) / (end - start)) * 100)))
 })
 
-// 未来已报名课程（3天内的）
 const upcomingMyCourses = computed(() => {
   const today = new Date().toISOString().slice(0, 10)
   const end = new Date(); end.setDate(end.getDate() + 3)
@@ -139,60 +151,337 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-.home-page { padding: 16px; }
-
-.welcome-card {
-  background: linear-gradient(135deg, $color-cobalt, $color-cobalt-dark);
-  color: #fff; padding: 24px; border-radius: $radius-lg; margin-bottom: 24px;
-  h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
-  .greeting { font-size: $font-size-sm; opacity: 0.8; margin-bottom: 16px; }
-  .welcome-desc { font-size: 14px; opacity: 0.85; margin-bottom: 16px; }
-  .cta-btn { margin-top: 12px; }
+.home-page {
+  padding-bottom: 40px;
 }
 
-.stats-row { display: flex; gap: 32px; margin-bottom: 18px; }
-.stat-item { display: flex; flex-direction: column; }
-.stat-num { font-size: 28px; font-weight: 700; font-family: $font-display; }
-.stat-label { font-size: 12px; opacity: 0.8; }
-
-.card-strip {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; background: rgba(255,255,255,0.12);
-  border-radius: $radius-md; cursor: pointer; margin-top: 4px;
-  &:hover { background: rgba(255,255,255,0.18); }
-}
-.strip-left { display: flex; flex-direction: column; gap: 2px; }
-.strip-type { font-family: $font-display; font-size: $font-size-base; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
-.strip-days { font-size: $font-size-sm; opacity: 0.7; &.warn { color: #ff9f43; opacity: 1; } }
-.strip-right { display: flex; align-items: center; gap: 10px; }
-.strip-progress { width: 60px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; }
-.strip-bar { height: 100%; background: #fff; border-radius: 2px; transition: width 0.5s; &.warn { background: #ff9f43; } }
-.strip-arrow { font-size: 22px; opacity: 0.6; }
-
-// 近期课程提醒
-.upcoming-strip { margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; gap: 6px; }
-.upcoming-item { display: flex; align-items: center; gap: 8px; font-size: $font-size-sm; cursor: pointer; opacity: 0.85; transition: opacity 0.2s;
-  &:hover { opacity: 1; }
-}
-.up-dot { width: 6px; height: 6px; border-radius: 50%; background: #5C9A4F; flex-shrink: 0; }
-.up-name { flex: 1; font-weight: 500; }
-.up-time { opacity: 0.6; font-size: $font-size-sm; }
-
-.section { margin-bottom: 24px; }
-.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
-  h3 { font-size: 17px; font-weight: 600; color: $color-carbon; margin: 0; }
-}
-.more-link { font-size: 13px; color: $color-cobalt; cursor: pointer; &:hover { text-decoration: underline; } }
-
-.empty-box { text-align: center; padding: 40px 0; color: $color-lead;
-  .empty-emoji { font-size: 40px; display: block; margin-bottom: 12px; }
-  p { font-size: $font-size-sm; margin-bottom: 8px; }
-}
-.empty-link { font-size: $font-size-sm; color: $color-cobalt; text-decoration: none; font-weight: 500;
-  &:hover { text-decoration: underline; }
+// ======== Hero — Apple-style ========
+.hero {
+  padding: 48px 24px 36px;
+  text-align: center;
+  background: $color-bg;
 }
 
+.hero-greet {
+  font-size: $font-size-4xl;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: $color-text-primary;
+  margin-bottom: 32px;
+  line-height: 1.1;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-bottom: 32px;
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-num {
+  font-size: $font-size-5xl;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $color-text-primary;
+  line-height: 1;
+}
+
+.hero-label {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: 4px;
+}
+
+// Membership strip
+.hero-card-strip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 28px;
+  background: $color-bg-secondary;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  margin-bottom: 28px;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: #eeeef2;
+  }
+}
+
+.strip-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.strip-type {
+  font-size: $font-size-base;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.strip-days {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+
+  &.warn {
+    color: $color-danger;
+  }
+}
+
+.strip-bar {
+  width: 120px;
+  height: 4px;
+  background: $color-border-light;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.strip-fill {
+  height: 100%;
+  background: $color-accent;
+  border-radius: 2px;
+  transition: width 0.5s;
+
+  &.warn {
+    background: $color-danger;
+  }
+}
+
+// Upcoming
+.hero-next {
+  text-align: left;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.next-title {
+  font-size: $font-size-xs;
+  font-weight: 600;
+  color: $color-text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+
+.hero-next-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid $color-border-light;
+  cursor: pointer;
+  transition: opacity $transition-fast;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $color-success;
+  flex-shrink: 0;
+}
+
+.next-name {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.next-time {
+  margin-left: auto;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+// ======== Guest Hero ========
+.hero-guest {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+}
+
+.guest-title {
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: $color-text-primary;
+  margin-bottom: 8px;
+}
+
+.guest-sub {
+  font-size: $font-size-xl;
+  color: $color-text-secondary;
+  font-weight: 400;
+  margin-bottom: 24px;
+}
+
+.guest-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.guest-link {
+  font-size: $font-size-lg;
+  color: $color-accent;
+  cursor: pointer;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.guest-sep {
+  color: $color-text-tertiary;
+  font-size: $font-size-lg;
+}
+
+// ======== Module ========
+.module {
+  margin: 0 auto 8px;
+  max-width: 680px;
+  padding: 0 24px;
+}
+
+.module-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 32px 0 16px;
+
+  h3 {
+    font-size: $font-size-2xl;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: $color-text-primary;
+  }
+}
+
+.module-more {
+  font-size: $font-size-sm;
+  color: $color-accent;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.module-tabs {
+  display: flex;
+  gap: 2px;
+  background: $color-bg-secondary;
+  border-radius: $radius-pill;
+  padding: 2px;
+  width: fit-content;
+  margin-bottom: 12px;
+
+  button {
+    padding: 6px 16px;
+    border: none;
+    background: transparent;
+    font-size: $font-size-xs;
+    font-weight: 500;
+    font-family: $font-family;
+    color: $color-text-secondary;
+    cursor: pointer;
+    border-radius: $radius-pill;
+    transition: all $transition-fast;
+
+    &.active {
+      background: $color-bg;
+      color: $color-text-primary;
+      box-shadow: $shadow-sm;
+    }
+  }
+}
+
+.module-body {
+  padding-bottom: 8px;
+}
+
+.module-empty {
+  text-align: center;
+  padding: 48px 0;
+  color: $color-text-secondary;
+
+  p {
+    font-size: $font-size-sm;
+    margin-bottom: 8px;
+  }
+}
+
+.module-empty-link {
+  font-size: $font-size-sm;
+  color: $color-accent;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ── Dark Mode ───────────────────────────────
 html.dark {
-  .section-header h3 { color: $dark-text; }
+  .hero {
+    background: $dark-bg;
+  }
+
+  .hero-greet,
+  .guest-title,
+  .hero-num,
+  .next-name {
+    color: $dark-text;
+  }
+
+  .module-head h3 {
+    color: $dark-text;
+  }
+
+  .module-tabs {
+    background: $dark-bg-secondary;
+
+    button.active {
+      background: #2c2c2e;
+      color: $dark-text;
+    }
+  }
+
+  .hero-card-strip {
+    background: $dark-bg-secondary;
+
+    &:hover {
+      background: #2c2c2e;
+    }
+  }
+
+  .strip-type {
+    color: $dark-text;
+  }
+
+  .hero-next-item {
+    border-bottom-color: $dark-border;
+  }
 }
 </style>
