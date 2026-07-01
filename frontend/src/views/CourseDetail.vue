@@ -23,7 +23,7 @@
       </div>
       <div class="info-row" v-if="course.coachName">
         <span class="info-label">教练</span>
-        <span class="info-value">{{ course.coachName }}</span>
+        <span class="info-value link" @click="$router.push(`/coaches/${course.coachId}`)">{{ course.coachName }}</span>
       </div>
       <div class="info-row">
         <span class="info-label">描述</span>
@@ -224,7 +224,9 @@ onMounted(async () => {
   &:last-child { border-bottom: none; }
 }
 .info-label { width: 56px; font-size: 14px; color: $color-lead; flex-shrink: 0; }
-.info-value { font-size: 14px; color: $color-carbon; }
+.info-value { font-size: 14px; color: $color-carbon;
+  &.link { color: $color-cobalt; cursor: pointer; &:hover { text-decoration: underline; } }
+}
 
 .checkin-row { border-bottom: none; }
 .checkin-ok { color: $color-cobalt; font-weight: 500; }

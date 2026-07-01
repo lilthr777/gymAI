@@ -28,12 +28,12 @@
         </div>
       </div>
 
-      <!-- 训练日历 -->
-      <div class="cal-strip">
-        <div v-for="d in weekDays" :key="d.date" class="cal-day" :class="{ trained: d.trained, today: d.isToday }">
-          <span class="cal-day-label">{{ d.dow }}</span>
-          <span class="cal-day-num">{{ d.num }}</span>
-          <span class="cal-day-dot">●</span>
+      <!-- 近期课程提醒 -->
+      <div v-if="upcomingMyCourses.length" class="upcoming-strip">
+        <div v-for="c in upcomingMyCourses" :key="c.id" class="upcoming-item" @click="$router.push(`/courses/${c.id}`)">
+          <span class="up-dot"></span>
+          <span class="up-name">{{ c.name }}</span>
+          <span class="up-time">{{ c.courseDate?.slice(5) }} {{ c.startTime?.slice(0, 5) }}</span>
         </div>
       </div>
     </div>
@@ -120,23 +120,14 @@ const cardProgress = computed(() => {
   return Math.min(100, Math.max(0, Math.round(((Date.now() - start) / (end - start)) * 100)))
 })
 
-// 训练日历：最近 7 天
-const weekDays = computed(() => {
-  const dates: { date: string; dow: string; num: number; trained: boolean; isToday: boolean }[] = []
-  const trainedSet = new Set(homeData.value.checkinDates || [])
-  const now = new Date()
-  const dows = ['日', '一', '二', '三', '四', '五', '六']
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(now.getDate() - i)
-    const ds = d.toISOString().slice(0, 10)
-    dates.push({
-      date: ds, dow: dows[d.getDay()], num: d.getDate(),
-      trained: trainedSet.has(ds),
-      isToday: i === 0,
-    })
-  }
-  return dates
+// 未来已报名课程（3天内的）
+const upcomingMyCourses = computed(() => {
+  const today = new Date().toISOString().slice(0, 10)
+  const end = new Date(); end.setDate(end.getDate() + 3)
+  const endStr = end.toISOString().slice(0, 10)
+  return (homeData.value.myCourses || [])
+    .filter(c => c.courseDate && c.courseDate >= today && c.courseDate <= endStr)
+    .slice(0, 5)
 })
 
 const goDetail = (id?: number) => { if (id) router.push(`/courses/${id}`) }
@@ -178,17 +169,14 @@ onMounted(async () => {
 .strip-bar { height: 100%; background: #fff; border-radius: 2px; transition: width 0.5s; &.warn { background: #ff9f43; } }
 .strip-arrow { font-size: 22px; opacity: 0.6; }
 
-// 训练日历
-.cal-strip { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.15); }
-.cal-day { display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0.5; min-width: 28px;
-  &.trained { opacity: 1; }
-  &.today .cal-day-num { font-weight: 700; }
+// 近期课程提醒
+.upcoming-strip { margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; gap: 6px; }
+.upcoming-item { display: flex; align-items: center; gap: 8px; font-size: $font-size-sm; cursor: pointer; opacity: 0.85; transition: opacity 0.2s;
+  &:hover { opacity: 1; }
 }
-.cal-day-label { font-size: 10px; text-transform: uppercase; }
-.cal-day-num { font-size: 13px; font-weight: 500; }
-.cal-day-dot { font-size: 6px; visibility: hidden;
-  .trained & { visibility: visible; color: $color-cobalt; }
-}
+.up-dot { width: 6px; height: 6px; border-radius: 50%; background: #5C9A4F; flex-shrink: 0; }
+.up-name { flex: 1; font-weight: 500; }
+.up-time { opacity: 0.6; font-size: $font-size-sm; }
 
 .section { margin-bottom: 24px; }
 .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
