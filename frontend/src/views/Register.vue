@@ -171,6 +171,14 @@ html.dark {
   .form-title {
     color: $dark-text;
   }
+
+  .form-desc {
+    color: $dark-text-secondary;
+  }
+
+  .form-hint {
+    color: $dark-text-secondary;
+  }
 }
 
 @media (max-width: 480px) {

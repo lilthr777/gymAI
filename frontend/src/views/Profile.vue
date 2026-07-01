@@ -158,5 +158,13 @@ html.dark {
       background: rgba(255, 255, 255, 0.03);
     }
   }
+
+  .menu-extra {
+    color: $dark-text-secondary;
+  }
+
+  .menu-arrow {
+    color: $dark-text-secondary;
+  }
 }
 </style>

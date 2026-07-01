@@ -30,4 +30,14 @@ defineEmits<{ 'update:modelValue': [value: number] }>()
     color: #ff9f0a;
   }
 }
+
+html.dark {
+  .star {
+    color: rgba(255, 255, 255, 0.15);
+
+    &.filled {
+      color: #ff9f0a;
+    }
+  }
+}
 </style>

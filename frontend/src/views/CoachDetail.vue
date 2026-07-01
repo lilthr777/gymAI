@@ -9,10 +9,12 @@
 
     <div class="coach-hero">
       <el-avatar :size="96" icon="UserFilled" :src="coach.avatar" />
-      <h2>{{ coach.name }}</h2>
-      <button v-if="userStore.isLoggedIn()" class="fav-btn" :class="{ favorited }" @click="toggleFav">
-        {{ favorited ? '♥' : '♡' }}
-      </button>
+      <div class="coach-name-row">
+        <h2>{{ coach.name }}</h2>
+        <button v-if="userStore.isLoggedIn()" class="fav-btn" :class="{ favorited }" @click="toggleFav">
+          <el-icon :size="20"><StarFilled v-if="favorited" /><Star v-else /></el-icon>
+        </button>
+      </div>
       <div class="coach-tags">
         <span v-for="tag in tags" :key="tag" class="tag">{{ tag }}</span>
       </div>
@@ -40,7 +42,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { ArrowLeft } from '@element-plus/icons-vue'
+import { ArrowLeft, Star, StarFilled } from '@element-plus/icons-vue'
 import { coachApi, courseApi, favoriteApi } from '@/api'
 import { useUserStore } from '@/stores/user'
 import type { Coach, Course } from '@/types'
@@ -122,30 +124,39 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   padding: 40px 0 32px;
-  position: relative;
+}
+
+.coach-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 12px;
 
   h2 {
     font-size: $font-size-2xl;
     font-weight: 700;
     letter-spacing: -0.02em;
     color: $color-text-primary;
-    margin: 20px 0 12px;
+    margin: 0;
   }
 }
 
 .fav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
   border: none;
   background: none;
-  font-size: 24px;
   cursor: pointer;
-  color: $color-border;
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  transition: color $transition-fast;
+  color: $color-text-tertiary;
+  border-radius: 50%;
+  transition: all $transition-fast;
 
   &:hover {
     color: $color-danger;
+    background: rgba($color-danger, 0.08);
   }
 
   &.favorited {
@@ -217,6 +228,7 @@ html.dark {
 
   .tag {
     background: $dark-bg-secondary;
+    color: $dark-text-secondary;
   }
 
   .course-list {

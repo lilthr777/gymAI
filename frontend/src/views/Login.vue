@@ -299,6 +299,10 @@ html.dark {
     color: $dark-text;
   }
 
+  .brand-tagline {
+    color: $dark-text-secondary;
+  }
+
   .form-card {
     background: $dark-bg-secondary;
     border-color: $dark-border;
@@ -306,6 +310,28 @@ html.dark {
 
   .form-title {
     color: $dark-text;
+  }
+
+  .form-desc {
+    color: $dark-text-secondary;
+  }
+
+  .social-divider span {
+    color: $dark-text-secondary;
+  }
+
+  .social-btn {
+    border-color: $dark-border;
+    color: $dark-text-secondary;
+
+    &:hover {
+      border-color: $color-accent;
+      color: $color-accent;
+    }
+  }
+
+  .form-hint {
+    color: $dark-text-secondary;
   }
 }
 

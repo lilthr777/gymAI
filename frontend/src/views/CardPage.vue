@@ -410,6 +410,12 @@ html.dark {
     border-color: $dark-border;
   }
 
+  .plan-desc,
+  .plan-unit,
+  .order-time {
+    color: $dark-text-secondary;
+  }
+
   .order-list {
     background: $dark-bg;
     border-color: $dark-border;

@@ -212,6 +212,12 @@ html.dark {
     color: $dark-text;
   }
 
+  .info-label,
+  .avatar-hint,
+  .section-title {
+    color: $dark-text-secondary;
+  }
+
   .info-card,
   .form-card {
     background: $dark-bg-secondary;

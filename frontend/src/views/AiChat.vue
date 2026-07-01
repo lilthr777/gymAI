@@ -557,7 +557,7 @@ html.dark {
   }
 
   .msg-bubble.bubble--bot {
-    background: #2c2c2e;
+    background: $dark-border-secondary;
     color: $dark-text;
   }
 

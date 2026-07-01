@@ -176,7 +176,7 @@ html.dark {
     background: $dark-bg-secondary;
 
     .tab-btn.active {
-      background: #2c2c2e;
+      background: $dark-border-secondary;
       color: $dark-text;
     }
   }

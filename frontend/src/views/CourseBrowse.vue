@@ -120,7 +120,7 @@ onMounted(() => fetchList())
     height: 44px;
 
     &:hover {
-      background: #f0f0f2;
+      background: $color-border-light;
       box-shadow: none;
     }
 
@@ -153,7 +153,7 @@ onMounted(() => fetchList())
   font-weight: 500;
 
   &:hover {
-    background: #e8e8ed;
+    background: $color-border-light;
   }
 
   &.active {

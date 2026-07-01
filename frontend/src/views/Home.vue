@@ -49,43 +49,47 @@
 
     <!-- ======== Course Module ======== -->
     <section class="module">
-      <div class="module-head">
-        <h3>课程</h3>
-        <span class="module-more" @click="$router.push('/courses')">查看全部 &rarr;</span>
-      </div>
-      <div class="module-body">
-        <div class="module-tabs">
-          <button :class="{ active: courseTab === 'my' }" @click="courseTab = 'my'">我的</button>
-          <button :class="{ active: courseTab === 'all' }" @click="courseTab = 'all'">全部课程</button>
+      <div class="module-inner">
+        <div class="module-head">
+          <h3>课程</h3>
+          <span class="module-more" @click="$router.push('/courses')">查看全部 &rarr;</span>
         </div>
-        <template v-if="courseTab === 'my'">
-          <template v-if="homeData.myCourses?.length">
-            <CourseCard v-for="c in homeData.myCourses.slice(0, 4)" :key="c.id" :course="c" @click="goDetail(c.id)" />
-          </template>
-          <div v-else class="module-empty">
-            <p>还没有报名的课程</p>
-            <span class="module-empty-link" @click="courseTab = 'all'">去看看全部课程 &rarr;</span>
+        <div class="module-body">
+          <div class="module-tabs">
+            <button :class="{ active: courseTab === 'my' }" @click="courseTab = 'my'">我的</button>
+            <button :class="{ active: courseTab === 'all' }" @click="courseTab = 'all'">全部课程</button>
           </div>
-        </template>
-        <template v-else>
-          <template v-if="homeData.upcomingCourses?.length">
-            <CourseCard v-for="c in homeData.upcomingCourses.slice(0, 6)" :key="c.id" :course="c" @click="goDetail(c.id)" />
+          <template v-if="courseTab === 'my'">
+            <template v-if="homeData.myCourses?.length">
+              <CourseCard v-for="c in homeData.myCourses.slice(0, 4)" :key="c.id" :course="c" @click="goDetail(c.id)" />
+            </template>
+            <div v-else class="module-empty">
+              <p>还没有报名的课程</p>
+              <span class="module-empty-link" @click="courseTab = 'all'">去看看全部课程 &rarr;</span>
+            </div>
           </template>
-          <div v-else class="module-empty">
-            <p>暂无课程安排</p>
-          </div>
-        </template>
+          <template v-else>
+            <template v-if="homeData.upcomingCourses?.length">
+              <CourseCard v-for="c in homeData.upcomingCourses.slice(0, 6)" :key="c.id" :course="c" @click="goDetail(c.id)" />
+            </template>
+            <div v-else class="module-empty">
+              <p>暂无课程安排</p>
+            </div>
+          </template>
+        </div>
       </div>
     </section>
 
     <!-- ======== Coach Module ======== -->
     <section class="module">
-      <div class="module-head">
-        <h3>教练团队</h3>
-        <span class="module-more" @click="$router.push('/coaches')">查看全部 &rarr;</span>
-      </div>
-      <div class="module-body">
-        <CoachCard v-for="c in homeData.coaches" :key="c.id" :coach="c" @click="router.push(`/coaches/${c.id}`)" />
+      <div class="module-inner">
+        <div class="module-head">
+          <h3>教练团队</h3>
+          <span class="module-more" @click="$router.push('/coaches')">查看全部 &rarr;</span>
+        </div>
+        <div class="module-body">
+          <CoachCard v-for="c in homeData.coaches" :key="c.id" :coach="c" @click="router.push(`/coaches/${c.id}`)" />
+        </div>
       </div>
     </section>
   </div>
@@ -212,7 +216,7 @@ onMounted(async () => {
   transition: background $transition-fast;
 
   &:hover {
-    background: #eeeef2;
+    background: $color-border-light;
   }
 }
 
@@ -358,16 +362,23 @@ onMounted(async () => {
 
 // ======== Module ========
 .module {
-  margin: 0 auto 8px;
+  padding: 48px 24px 52px;
+
+  &:nth-child(even) {
+    background: $color-bg-secondary;
+  }
+}
+
+.module-inner {
   max-width: 680px;
-  padding: 0 24px;
+  margin: 0 auto;
 }
 
 .module-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 32px 0 16px;
+  margin-bottom: 20px;
 
   h3 {
     font-size: $font-size-2xl;
@@ -455,15 +466,19 @@ html.dark {
     color: $dark-text;
   }
 
+  .module:nth-child(even) {
+    background: $dark-bg-secondary;
+  }
+
   .module-head h3 {
     color: $dark-text;
   }
 
   .module-tabs {
-    background: $dark-bg-secondary;
+    background: rgba(255, 255, 255, 0.08);
 
     button.active {
-      background: #2c2c2e;
+      background: $dark-border-secondary;
       color: $dark-text;
     }
   }
@@ -472,7 +487,7 @@ html.dark {
     background: $dark-bg-secondary;
 
     &:hover {
-      background: #2c2c2e;
+      background: $dark-border-secondary;
     }
   }
 

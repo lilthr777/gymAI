@@ -232,7 +232,7 @@ html.dark {
   --el-bg-color-page: #{$dark-bg};
   --el-border-color: #{$dark-border};
   --el-border-color-light: #{$dark-border-secondary};
-  --el-border-color-lighter: #2c2c2e;
+  --el-border-color-lighter: #{$dark-border-secondary};
   --el-text-color-primary: #{$dark-text};
   --el-text-color-regular: #{$dark-text};
   --el-text-color-secondary: #{$dark-text-secondary};

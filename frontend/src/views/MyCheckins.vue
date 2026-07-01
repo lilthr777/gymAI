@@ -200,6 +200,10 @@ html.dark {
     color: $dark-text;
   }
 
+  .checkin-course {
+    color: $dark-text-secondary;
+  }
+
   .checkin-list {
     background: $dark-bg;
     border-color: $dark-border;

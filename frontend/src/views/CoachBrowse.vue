@@ -1,5 +1,11 @@
 <template>
   <div class="coach-browse">
+    <div class="page-nav">
+      <button class="back-btn" @click="$router.back()">
+        <el-icon :size="20"><ArrowLeft /></el-icon>
+      </button>
+    </div>
+
     <div class="search-wrap">
       <el-input v-model="keyword" placeholder="搜索教练" clearable class="search-bar" @input="search">
         <template #prefix><el-icon><Search /></el-icon></template>
@@ -25,7 +31,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { Search } from '@element-plus/icons-vue'
+import { Search, ArrowLeft } from '@element-plus/icons-vue'
 import { coachApi, favoriteApi } from '@/api'
 import type { Coach } from '@/types'
 import CoachCard from '@/components/CoachCard.vue'
@@ -114,6 +120,29 @@ onMounted(async () => {
   margin: 0 auto;
 }
 
+.page-nav {
+  margin-bottom: 12px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: $color-accent;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba($color-accent, 0.08);
+  }
+}
+
 .search-wrap {
   margin-bottom: 16px;
 
@@ -126,7 +155,7 @@ onMounted(async () => {
     height: 44px;
 
     &:hover {
-      background: #f0f0f2;
+      background: $color-border-light;
       box-shadow: none;
     }
 
@@ -159,7 +188,7 @@ onMounted(async () => {
   font-weight: 500;
 
   &:hover {
-    background: #e8e8ed;
+    background: $color-border-light;
   }
 
   &.active {
