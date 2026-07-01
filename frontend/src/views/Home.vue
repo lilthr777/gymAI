@@ -406,13 +406,13 @@ onMounted(async () => {
   border-radius: $radius-pill;
   padding: 2px;
   width: fit-content;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 
   button {
-    padding: 6px 16px;
+    padding: 7px 18px;
     border: none;
     background: transparent;
-    font-size: $font-size-xs;
+    font-size: $font-size-sm;
     font-weight: 500;
     font-family: $font-family;
     color: $color-text-secondary;
@@ -429,7 +429,9 @@ onMounted(async () => {
 }
 
 .module-body {
-  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .module-empty {

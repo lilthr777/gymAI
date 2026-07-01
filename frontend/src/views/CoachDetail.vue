@@ -205,10 +205,9 @@ onMounted(async () => {
 }
 
 .course-list {
-  background: $color-bg;
-  border: 1px solid $color-border-light;
-  border-radius: $radius-lg;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 html.dark {
@@ -231,9 +230,8 @@ html.dark {
     color: $dark-text-secondary;
   }
 
-  .course-list {
-    background: $dark-bg;
-    border-color: $dark-border;
+  .course-list .course-card {
+    background: $dark-bg-secondary;
   }
 }
 </style>

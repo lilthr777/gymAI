@@ -123,6 +123,7 @@ declare module 'vue-router' {
     showTabBar?: boolean
     requiresAuth?: boolean
     icon?: string
+    transition?: string
   }
 }
 

@@ -163,10 +163,9 @@ onMounted(() => fetchList())
 }
 
 .list-area {
-  background: $color-bg;
-  border-radius: $radius-lg;
-  border: 1px solid $color-border-light;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .load-more {
@@ -199,9 +198,14 @@ html.dark {
     }
   }
 
-  .list-area {
-    background: $dark-bg;
-    border-color: $dark-border;
+  .filter-btn {
+    background: $dark-bg-secondary;
+    color: $dark-text;
+
+    &.active {
+      background: $dark-text;
+      color: $dark-bg;
+    }
   }
 }
 </style>

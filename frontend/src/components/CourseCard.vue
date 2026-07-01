@@ -1,19 +1,18 @@
 <template>
   <div class="course-card" @click="$emit('click')">
-    <div class="card-left">
-      <div class="card-date">{{ course.courseDate }}</div>
-      <div class="card-hours">{{ course.startTime?.slice(0, 5) }} - {{ course.endTime?.slice(0, 5) }}</div>
-    </div>
-    <div class="card-body">
-      <div class="card-name">{{ course.name }}</div>
-      <div class="card-meta">
-        <span v-if="course.coachName">{{ course.coachName }}</span>
-        <span v-if="course.coachName" class="meta-sep">&middot;</span>
-        <span>{{ course.currentCount }}/{{ course.maxCapacity }}人</span>
+    <div class="card-top">
+      <div class="card-date">{{ course.courseDate?.slice(5) }}</div>
+      <div class="card-status">
+        <span class="status-badge" :class="statusClass">{{ tagText }}</span>
       </div>
     </div>
-    <div class="card-right">
-      <span class="status-badge" :class="statusClass">{{ tagText }}</span>
+    <h4 class="card-name">{{ course.name }}</h4>
+    <div class="card-bottom">
+      <span class="card-time">{{ course.startTime?.slice(0, 5) }} - {{ course.endTime?.slice(0, 5) }}</span>
+      <span class="meta-sep">&middot;</span>
+      <span v-if="course.coachName">{{ course.coachName }}</span>
+      <span class="meta-sep">&middot;</span>
+      <span>{{ course.currentCount }}/{{ course.maxCapacity }}人</span>
     </div>
   </div>
 </template>
@@ -45,67 +44,30 @@ const statusClass = computed(() => {
 
 <style scoped lang="scss">
 .course-card {
-  display: flex;
-  align-items: center;
-  padding: 16px;
+  padding: 20px;
   background: $color-bg;
-  border-bottom: 1px solid $color-border-light;
+  border-radius: $radius-lg;
   cursor: pointer;
-  transition: background $transition-fast;
-
-  &:last-child {
-    border-bottom: none;
-  }
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.02);
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
   }
 }
 
-.card-left {
-  text-align: center;
-  min-width: 72px;
-  margin-right: 16px;
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .card-date {
-  font-size: $font-size-base;
+  font-size: $font-size-sm;
   font-weight: 600;
-  color: $color-text-primary;
+  color: $color-accent;
   letter-spacing: -0.01em;
-}
-
-.card-hours {
-  font-size: $font-size-xs;
-  color: $color-text-secondary;
-  margin-top: 2px;
-}
-
-.card-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.card-name {
-  font-size: $font-size-base;
-  font-weight: 500;
-  color: $color-text-primary;
-  margin-bottom: 3px;
-  letter-spacing: -0.01em;
-}
-
-.card-meta {
-  font-size: $font-size-xs;
-  color: $color-text-secondary;
-
-  .meta-sep {
-    margin: 0 6px;
-  }
-}
-
-.card-right {
-  margin-left: 12px;
-  flex-shrink: 0;
 }
 
 .status-badge {
@@ -118,35 +80,61 @@ const statusClass = computed(() => {
     color: $color-success;
     background: rgba($color-success, 0.1);
   }
-
   &.status--warning {
     color: $color-warning;
     background: rgba($color-warning, 0.1);
   }
-
   &.status--danger {
     color: $color-danger;
     background: rgba($color-danger, 0.1);
   }
-
   &.status--default {
     color: $color-accent;
     background: rgba($color-accent, 0.1);
   }
 }
 
+.card-name {
+  font-size: $font-size-xl;
+  font-weight: 600;
+  color: $color-text-primary;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.card-bottom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+
+  .meta-sep {
+    opacity: 0.4;
+    font-size: 8px;
+  }
+}
+
+.card-time {
+  font-weight: 500;
+  color: $color-text-primary;
+}
+
 html.dark {
   .course-card {
-    background: $dark-bg;
-    border-bottom-color: $dark-border;
+    background: $dark-bg-secondary;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.03);
+      background: #222225;
     }
   }
 
-  .card-date,
   .card-name {
+    color: $dark-text;
+  }
+
+  .card-time {
     color: $dark-text;
   }
 }

@@ -11,7 +11,7 @@
         </button>
         <el-dropdown v-if="userStore.isLoggedIn()" trigger="click" placement="bottom-end">
           <button class="user-trigger">
-            <el-avatar :size="28" icon="UserFilled" />
+            <el-avatar :size="28" icon="UserFilled" :src="userStore.avatar" />
           </button>
           <template #dropdown>
             <el-dropdown-menu>
@@ -25,7 +25,11 @@
 
     <!-- Content area -->
     <main class="main-content">
-      <router-view />
+      <router-view v-slot="{ Component, route }">
+        <Transition :name="route.meta.transition || 'fade'" mode="out-in">
+          <component :is="Component" :key="route.path" />
+        </Transition>
+      </router-view>
     </main>
 
     <!-- Bottom tab bar -->

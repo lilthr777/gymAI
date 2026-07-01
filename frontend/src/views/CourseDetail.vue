@@ -247,28 +247,24 @@ onMounted(async () => {
 }
 
 .detail-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 
   h2 {
-    font-size: $font-size-3xl;
+    font-size: 36px;
     font-weight: 700;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
     color: $color-text-primary;
-    line-height: 1.15;
+    line-height: 1.1;
+    margin-bottom: 12px;
   }
 }
 
 .status-badge {
+  display: inline-block;
   font-size: $font-size-xs;
   font-weight: 500;
   padding: 4px 12px;
   border-radius: $radius-pill;
-  flex-shrink: 0;
-  white-space: nowrap;
 
   &.status--success {
     color: $color-success;
@@ -290,16 +286,12 @@ onMounted(async () => {
 
 // Info
 .detail-info {
-  background: $color-bg;
-  border: 1px solid $color-border-light;
-  border-radius: $radius-lg;
-  overflow: hidden;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
 .info-row {
   display: flex;
-  padding: 14px 20px;
+  padding: 12px 0;
   border-bottom: 1px solid $color-border-light;
 
   &:last-child {
@@ -308,28 +300,29 @@ onMounted(async () => {
 }
 
 .info-label {
-  width: 52px;
-  font-size: $font-size-sm;
+  width: 48px;
+  font-size: 15px;
+  font-weight: 400;
   color: $color-text-secondary;
   flex-shrink: 0;
+  padding-top: 2px;
 }
 
 .info-value {
-  font-size: $font-size-sm;
+  font-size: 15px;
+  font-weight: 400;
   color: $color-text-primary;
+  line-height: 1.45;
 
   &.link {
     color: $color-accent;
     cursor: pointer;
+    font-weight: 500;
 
     &:hover {
       text-decoration: underline;
     }
   }
-}
-
-.checkin-row {
-  border-bottom: none;
 }
 
 .checkin-ok {
@@ -341,14 +334,14 @@ onMounted(async () => {
 .detail-actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 40px;
+  gap: 10px;
+  margin: 40px 0 48px;
 }
 
 .action-btn {
   width: 100%;
-  height: 48px;
-  font-size: 16px;
+  height: 52px;
+  font-size: $font-size-base;
   font-weight: 500;
   border-radius: $radius-md;
 }
@@ -356,7 +349,7 @@ onMounted(async () => {
 .text-btn {
   display: block;
   width: 100%;
-  padding: 12px 0;
+  padding: 14px 0;
   border: none;
   background: none;
   font-size: $font-size-sm;
@@ -379,7 +372,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 16px 0;
+  padding: 20px 0;
   color: $color-success;
   font-size: $font-size-base;
   font-weight: 500;
@@ -393,7 +386,7 @@ onMounted(async () => {
 
 .login-hint {
   text-align: center;
-  padding: 32px 0;
+  padding: 40px 0;
   font-size: $font-size-sm;
   color: $color-text-secondary;
 
@@ -406,34 +399,31 @@ onMounted(async () => {
 // Reviews
 .review-section {
   border-top: 1px solid $color-border-light;
-  padding-top: 32px;
+  padding-top: 36px;
 }
 
 .section-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  align-items: baseline;
+  margin-bottom: 24px;
 
   h3 {
-    font-size: $font-size-xl;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: $color-text-primary;
   }
 }
 
 .avg-rating {
-  font-size: $font-size-base;
+  font-size: 15px;
   color: #ff9f0a;
   font-weight: 600;
 }
 
-.review-list {
-  margin-bottom: 20px;
-}
-
 .review-item {
-  padding: 16px 0;
+  padding: 18px 0;
   border-bottom: 1px solid $color-border-light;
 
   &:last-child {
@@ -445,12 +435,12 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .review-author {
   font-size: $font-size-sm;
-  font-weight: 500;
+  font-weight: 600;
   color: $color-text-primary;
 }
 
@@ -467,7 +457,7 @@ onMounted(async () => {
 }
 
 .review-form {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -488,18 +478,13 @@ onMounted(async () => {
   font-size: $font-size-sm;
   color: $color-text-secondary;
   text-align: center;
-  padding: 16px 0;
+  padding: 20px 0;
 }
 
 html.dark {
   .detail-header h2,
   .info-value {
     color: $dark-text;
-  }
-
-  .detail-info {
-    background: $dark-bg-secondary;
-    border-color: $dark-border;
   }
 
   .info-row {

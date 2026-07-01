@@ -1,8 +1,8 @@
 <template>
   <div class="coach-card" @click="$emit('click')">
-    <el-avatar :size="52" icon="UserFilled" :src="coach.avatar" />
-    <div class="card-info">
-      <div class="coach-name">{{ coach.name }}</div>
+    <el-avatar :size="60" icon="UserFilled" :src="coach.avatar" />
+    <div class="card-body">
+      <h4 class="coach-name">{{ coach.name }}</h4>
       <div class="coach-sub">
         <span v-if="courseCount != null" class="coach-courses">{{ courseCount }} 门课</span>
         <span v-if="tags.length" class="coach-tags">
@@ -10,13 +10,11 @@
         </span>
       </div>
     </div>
-    <el-icon :size="16" class="arrow-icon"><ArrowRight /></el-icon>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ArrowRight } from '@element-plus/icons-vue'
 import type { Coach } from '@/types'
 
 const props = defineProps<{ coach: Coach; courseCount?: number }>()
@@ -33,33 +31,30 @@ const tags = computed(() => {
 .coach-card {
   display: flex;
   align-items: center;
-  padding: 16px;
-  background: $color-bg;
-  border-bottom: 1px solid $color-border-light;
-  cursor: pointer;
   gap: 16px;
-  transition: background $transition-fast;
-
-  &:last-child {
-    border-bottom: none;
-  }
+  padding: 20px;
+  background: $color-bg;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.02);
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
   }
 }
 
-.card-info {
+.card-body {
   flex: 1;
   min-width: 0;
 }
 
 .coach-name {
-  font-size: $font-size-base;
-  font-weight: 500;
+  font-size: $font-size-lg;
+  font-weight: 600;
   color: $color-text-primary;
-  margin-bottom: 4px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
 }
 
 .coach-sub {
@@ -89,18 +84,12 @@ const tags = computed(() => {
   border-radius: $radius-pill;
 }
 
-.arrow-icon {
-  color: $color-text-tertiary;
-  flex-shrink: 0;
-}
-
 html.dark {
   .coach-card {
-    background: $dark-bg;
-    border-bottom-color: $dark-border;
+    background: $dark-bg-secondary;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.03);
+      background: #222225;
     }
   }
 
@@ -109,7 +98,7 @@ html.dark {
   }
 
   .tag {
-    background: $dark-bg-secondary;
+    background: rgba(255, 255, 255, 0.06);
   }
 }
 </style>

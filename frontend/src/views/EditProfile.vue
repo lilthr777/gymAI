@@ -9,8 +9,15 @@
     </div>
 
     <div class="avatar-section">
-      <el-avatar :size="80" icon="UserFilled" :src="profile.avatar" />
-      <p class="avatar-hint">头像</p>
+      <div class="avatar-upload" @click="triggerUpload">
+        <el-avatar :size="80" icon="UserFilled" :src="avatarPreview || profile.avatar" />
+        <div class="avatar-overlay">
+          <el-icon :size="20"><Camera /></el-icon>
+        </div>
+      </div>
+      <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFileChange" />
+      <p class="avatar-hint" v-if="!uploading">点击更换头像</p>
+      <p class="avatar-hint" v-else>上传中...</p>
     </div>
 
     <div class="info-card">
@@ -59,14 +66,17 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft } from '@element-plus/icons-vue'
+import { ArrowLeft, Camera } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
-import { userApi } from '@/api'
+import { userApi, uploadApi } from '@/api'
 import type { User } from '@/types'
 
 const router = useRouter()
 const userStore = useUserStore()
 const saving = ref(false)
+const uploading = ref(false)
+const avatarPreview = ref('')
+const fileInput = ref<HTMLInputElement>()
 
 const profile = reactive<User>({
   username: '', phone: '', nickname: '', avatar: '', gender: 0, status: 1,
@@ -74,11 +84,36 @@ const profile = reactive<User>({
 
 const form = reactive({ nickname: '', phone: '', gender: 0 })
 
+const triggerUpload = () => {
+  fileInput.value?.click()
+}
+
+const handleFileChange = async (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  uploading.value = true
+  try {
+    const res = await uploadApi.avatar(file)
+    const url = res.data
+    avatarPreview.value = url
+    profile.avatar = url
+    ElMessage.success('头像上传成功，保存后生效')
+  } catch {
+    ElMessage.error('上传失败')
+  } finally {
+    uploading.value = false
+    if (target) target.value = ''
+  }
+}
+
 const handleSave = async () => {
   saving.value = true
   try {
     await userApi.updateProfile({ nickname: form.nickname, phone: form.phone, gender: form.gender, avatar: profile.avatar })
     userStore.nickname = form.nickname
+    userStore.avatar = profile.avatar
     profile.nickname = form.nickname
     profile.phone = form.phone
     profile.gender = form.gender
@@ -137,8 +172,34 @@ onMounted(async () => {
 }
 
 .avatar-section {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 32px;
+}
+
+.avatar-upload {
+  position: relative;
+  cursor: pointer;
+  border-radius: 50%;
+  overflow: hidden;
+
+  &:hover .avatar-overlay {
+    opacity: 1;
+  }
+}
+
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #fff;
 }
 
 .avatar-hint {

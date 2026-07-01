@@ -41,6 +41,10 @@ instance.interceptors.request.use(
     if (userStore.token) {
       config.headers.Authorization = `Bearer ${userStore.token}`
     }
+    // FormData 需要让 axios 自动设置 Content-Type（含 boundary）
+    if (config.data instanceof FormData) {
+      config.headers.setContentType('multipart/form-data')
+    }
     return config
   },
   (error) => Promise.reject(error),

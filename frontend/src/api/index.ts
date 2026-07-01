@@ -7,6 +7,15 @@ export const authApi = {
   register: (data: RegisterForm) => request.post<any, ApiResponse<AuthResult>>('/api/auth/register', data),
 }
 
+// 上传
+export const uploadApi = {
+  avatar: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return request.post<any, ApiResponse<string>>('/api/upload/avatar', formData)
+  },
+}
+
 // 首页
 export const homeApi = {
   get: () => request.get<any, ApiResponse<HomeData>>('/api/home'),
