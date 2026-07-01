@@ -43,6 +43,19 @@ export const checkinApi = {
     request.get<any, ApiResponse<PageResult<Checkin>>>('/api/checkins/my', { params }),
 }
 
+// 评价
+export const reviewApi = {
+  list: (courseId: number, params?: any) => request.get<any, ApiResponse<PageResult<any>>>(`/api/reviews/course/${courseId}`, { params }),
+  submit: (data: { courseId: number; rating: number; comment?: string }) => request.post<any, ApiResponse<any>>('/api/reviews', data),
+}
+
+// 收藏教练
+export const favoriteApi = {
+  toggle: (coachId: number) => request.post<any, ApiResponse<any>>(`/api/favorites/coach/${coachId}`),
+  list: () => request.get<any, ApiResponse<any[]>>('/api/favorites/coaches'),
+  ids: () => request.get<any, ApiResponse<number[]>>('/api/favorites/coach-ids'),
+}
+
 // 会员卡
 export const cardApi = {
   info: () => request.get<any, ApiResponse<any>>('/api/card'),

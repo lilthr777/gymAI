@@ -27,6 +27,15 @@
           <span class="strip-arrow">&rsaquo;</span>
         </div>
       </div>
+
+      <!-- 训练日历 -->
+      <div class="cal-strip">
+        <div v-for="d in weekDays" :key="d.date" class="cal-day" :class="{ trained: d.trained, today: d.isToday }">
+          <span class="cal-day-label">{{ d.dow }}</span>
+          <span class="cal-day-num">{{ d.num }}</span>
+          <span class="cal-day-dot">●</span>
+        </div>
+      </div>
     </div>
 
     <div v-else class="welcome-card">
@@ -84,7 +93,7 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const homeData = ref<HomeData>({
-  myCourseCount: 0, monthCheckins: 0, myCourses: [], upcomingCourses: [], coaches: [], card: {},
+  myCourseCount: 0, monthCheckins: 0, checkinDates: [], myCourses: [], upcomingCourses: [], coaches: [], card: {},
 })
 
 const greeting = computed(() => {
@@ -109,6 +118,25 @@ const cardProgress = computed(() => {
   const end = new Date(card.cardEndDate).getTime()
   if (end <= start) return 0
   return Math.min(100, Math.max(0, Math.round(((Date.now() - start) / (end - start)) * 100)))
+})
+
+// 训练日历：最近 7 天
+const weekDays = computed(() => {
+  const dates: { date: string; dow: string; num: number; trained: boolean; isToday: boolean }[] = []
+  const trainedSet = new Set(homeData.value.checkinDates || [])
+  const now = new Date()
+  const dows = ['日', '一', '二', '三', '四', '五', '六']
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(now.getDate() - i)
+    const ds = d.toISOString().slice(0, 10)
+    dates.push({
+      date: ds, dow: dows[d.getDay()], num: d.getDate(),
+      trained: trainedSet.has(ds),
+      isToday: i === 0,
+    })
+  }
+  return dates
 })
 
 const goDetail = (id?: number) => { if (id) router.push(`/courses/${id}`) }
@@ -149,6 +177,18 @@ onMounted(async () => {
 .strip-progress { width: 60px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; }
 .strip-bar { height: 100%; background: #fff; border-radius: 2px; transition: width 0.5s; &.warn { background: #ff9f43; } }
 .strip-arrow { font-size: 22px; opacity: 0.6; }
+
+// 训练日历
+.cal-strip { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.15); }
+.cal-day { display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0.5; min-width: 28px;
+  &.trained { opacity: 1; }
+  &.today .cal-day-num { font-weight: 700; }
+}
+.cal-day-label { font-size: 10px; text-transform: uppercase; }
+.cal-day-num { font-size: 13px; font-weight: 500; }
+.cal-day-dot { font-size: 6px; visibility: hidden;
+  .trained & { visibility: visible; color: $color-cobalt; }
+}
 
 .section { margin-bottom: 24px; }
 .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;

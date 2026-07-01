@@ -79,6 +79,7 @@ export interface CardInfo {
 export interface HomeData {
   myCourseCount: number
   monthCheckins: number
+  checkinDates?: string[]
   myCourses: Course[]
   upcomingCourses: Course[]
   coaches: Coach[]

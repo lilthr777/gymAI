@@ -60,6 +60,35 @@
     <div v-else class="login-hint">
       <router-link to="/login">登录</router-link> 后即可报名和签到
     </div>
+
+    <!-- 评价 -->
+    <div class="review-section">
+      <div class="section-head">
+        <h3>学员评价</h3>
+        <span v-if="reviews.length" class="avg-rating">★ {{ avgRating.toFixed(1) }}</span>
+      </div>
+
+      <div v-if="reviews.length" class="review-list">
+        <div v-for="r in reviews" :key="r.id" class="review-item">
+          <div class="review-top">
+            <span class="review-author">{{ r.nickname }}</span>
+            <StarRating :modelValue="r.rating" :interactive="false" />
+            <span class="review-time">{{ r.createdAt?.slice(0, 10) }}</span>
+          </div>
+          <p v-if="r.comment" class="review-text">{{ r.comment }}</p>
+        </div>
+      </div>
+
+      <div v-if="userStore.isLoggedIn() && !myReviewSubmitted" class="review-form">
+        <div class="review-rate">
+          <span class="rate-label">评分</span>
+          <StarRating v-model="myRating" :interactive="true" />
+        </div>
+        <el-input v-model="myComment" type="textarea" :rows="2" placeholder="写下你的感受（可选）" class="review-input" />
+        <el-button type="primary" size="small" :loading="submittingReview" @click="submitReview">提交评价</el-button>
+      </div>
+      <div v-else-if="myReviewSubmitted" class="review-done">已评价</div>
+    </div>
   </div>
 </template>
 
@@ -69,12 +98,44 @@ import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, CircleCheckFilled } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
-import { courseApi, checkinApi } from '@/api'
+import { courseApi, checkinApi, reviewApi } from '@/api'
 import type { Course } from '@/types'
+import StarRating from '@/components/StarRating.vue'
 
 const route = useRoute()
 const userStore = useUserStore()
 const course = ref<Course | null>(null)
+
+// 评价
+const reviews = ref<any[]>([])
+const myRating = ref(5)
+const myComment = ref('')
+const myReviewSubmitted = ref(false)
+const submittingReview = ref(false)
+
+const avgRating = computed(() => {
+  if (!reviews.value.length) return 0
+  return reviews.value.reduce((s, r) => s + r.rating, 0) / reviews.value.length
+})
+
+const fetchReviews = async () => {
+  try {
+    const res = await reviewApi.list(Number(route.params.id))
+    reviews.value = res.data.records
+  } catch { /* handled */ }
+}
+
+const submitReview = async () => {
+  if (!course.value?.id) return
+  submittingReview.value = true
+  try {
+    await reviewApi.submit({ courseId: course.value.id, rating: myRating.value, comment: myComment.value })
+    myReviewSubmitted.value = true
+    ElMessage.success('评价成功')
+    fetchReviews()
+  } catch { /* handled */ }
+  finally { submittingReview.value = false }
+}
 const registered = ref(false)
 const checkedIn = ref(false)
 const checkinTime = ref('')
@@ -145,6 +206,7 @@ onMounted(async () => {
     course.value = res.data
     registered.value = !!res.data.registered
   } catch { /* handled */ }
+  fetchReviews()
 })
 </script>
 
@@ -178,6 +240,31 @@ onMounted(async () => {
 
 .login-hint { text-align: center; padding: 24px; font-size: 14px; color: $color-lead;
   a { color: $color-cobalt; font-weight: 500; }
+}
+
+// 评价
+.review-section { margin-top: 28px; padding: 0 4px; }
+.section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+  h3 { font-size: 16px; font-weight: 600; color: $color-carbon; }
+}
+.avg-rating { font-size: 14px; color: #f5a623; font-weight: 600; }
+.review-list { margin-bottom: 16px; }
+.review-item { padding: 12px 0; border-bottom: 1px solid $color-steel;
+  &:last-child { border-bottom: none; }
+}
+.review-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.review-author { font-size: 13px; font-weight: 500; color: $color-carbon; }
+.review-time { font-size: 11px; color: $color-lead; margin-left: auto; }
+.review-text { font-size: 13px; color: $color-ash; line-height: 1.5; }
+
+.review-form { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.review-rate { display: flex; align-items: center; gap: 10px; }
+.rate-label { font-size: 13px; color: $color-lead; }
+.review-done { font-size: 13px; color: $color-lead; text-align: center; padding: 12px 0; }
+
+html.dark {
+  .section-head h3, .review-author { color: $dark-text; }
+  .review-item { border-bottom-color: $dark-border; }
 }
 
 html.dark {

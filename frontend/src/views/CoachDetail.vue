@@ -6,6 +6,9 @@
     <div class="coach-hero">
       <el-avatar :size="72" icon="UserFilled" :src="coach.avatar" />
       <h2>{{ coach.name }}</h2>
+      <button v-if="userStore.isLoggedIn()" class="fav-btn" :class="{ favorited }" @click="toggleFav">
+        {{ favorited ? '♥' : '♡' }}
+      </button>
       <div class="coach-tags">
         <el-tag v-for="tag in tags" :key="tag" size="small" type="info">{{ tag }}</el-tag>
       </div>
@@ -32,12 +35,30 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
-import { coachApi, courseApi } from '@/api'
+import { coachApi, courseApi, favoriteApi } from '@/api'
+import { useUserStore } from '@/stores/user'
 import type { Coach, Course } from '@/types'
 import CourseCard from '@/components/CourseCard.vue'
 
 const route = useRoute()
+const userStore = useUserStore()
 const coach = ref<Coach | null>(null)
+const favorited = ref(false)
+
+const toggleFav = async () => {
+  if (!coach.value?.id) return
+  try {
+    const res = await favoriteApi.toggle(coach.value.id)
+    favorited.value = res.data.favorited
+  } catch { /* handled */ }
+}
+
+const checkFav = async (id: number) => {
+  try {
+    const res = await favoriteApi.ids()
+    favorited.value = res.data.includes(id)
+  } catch { /* handled */ }
+}
 const courses = ref<Course[]>([])
 
 const tags = computed(() => {
@@ -54,6 +75,7 @@ onMounted(async () => {
     ])
     coach.value = coachRes.data
     courses.value = courseRes.data.records
+    checkFav(id)
   } catch {
     // handled
   }
@@ -74,6 +96,7 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   padding: 24px 0;
+  position: relative;
 
   h2 {
     font-size: 22px;
@@ -81,6 +104,11 @@ onMounted(async () => {
     color: $color-carbon;
     margin: 12px 0 8px;
   }
+}
+
+.fav-btn { border: none; background: none; font-size: 22px; cursor: pointer; color: #ccc; position: absolute; top: 8px; right: 8px; transition: color 0.2s;
+  &:hover { color: #e74c3c; }
+  &.favorited { color: #e74c3c; }
 }
 
 .coach-tags {

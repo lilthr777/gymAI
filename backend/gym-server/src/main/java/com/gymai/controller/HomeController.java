@@ -44,6 +44,15 @@ public class HomeController {
                         .ge(Checkin::getCheckinTime, LocalDate.now().withDayOfMonth(1).atStartOfDay()));
         data.put("monthCheckins", monthCheckins);
 
+        // 本月签到日期列表（用于训练日历）
+        List<LocalDate> checkinDates = checkinMapper.selectList(
+                new LambdaQueryWrapper<Checkin>()
+                        .eq(Checkin::getUserId, userId)
+                        .ge(Checkin::getCheckinTime, LocalDate.now().withDayOfMonth(1).atStartOfDay())
+                        .orderByAsc(Checkin::getCheckinTime))
+                .stream().map(c -> c.getCheckinTime().toLocalDate()).distinct().toList();
+        data.put("checkinDates", checkinDates);
+
         // 用户已报名的课程 ID（用于后续排除）
         List<UserCourse> myCourses = userCourseMapper.selectList(
                 new LambdaQueryWrapper<UserCourse>().eq(UserCourse::getUserId, userId));
