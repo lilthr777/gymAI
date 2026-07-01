@@ -51,6 +51,7 @@ public class HomeController {
                 .orderByAsc(Course::getCourseDate).orderByAsc(Course::getStartTime);
         courseMapper.selectPage(coursePage, courseWrapper);
         fillCoachNames(coursePage.getRecords());
+        markUserRegistered(coursePage.getRecords(), userId);
         data.put("upcomingCourses", coursePage.getRecords());
 
         // 用户已报名的课程
@@ -61,6 +62,8 @@ public class HomeController {
             myCourseList = courseMapper.selectBatchIds(
                     myCourses.stream().map(UserCourse::getCourseId).toList());
             fillCoachNames(myCourseList);
+            // 我的课程全部标记为已报名
+            myCourseList.forEach(c -> c.setRegistered(true));
         }
         data.put("myCourses", myCourseList);
 
@@ -73,6 +76,19 @@ public class HomeController {
         data.put("coaches", coachPage.getRecords());
 
         return Result.ok(data);
+    }
+
+    /** 标记当前用户已报名的课程 */
+    private void markUserRegistered(List<Course> courses, Long userId) {
+        if (courses == null || courses.isEmpty()) return;
+        List<Long> courseIds = courses.stream().map(Course::getId).filter(id -> id != null).toList();
+        if (courseIds.isEmpty()) return;
+        List<Long> registeredIds = userCourseMapper.selectList(
+                new LambdaQueryWrapper<UserCourse>()
+                        .eq(UserCourse::getUserId, userId)
+                        .in(UserCourse::getCourseId, courseIds))
+                .stream().map(UserCourse::getCourseId).toList();
+        courses.forEach(c -> c.setRegistered(registeredIds.contains(c.getId())));
     }
 
     private void fillCoachNames(List<Course> courses) {

@@ -17,14 +17,14 @@
 
 ## 技术栈
 
-| 前端 | 后端 |
-|------|------|
-| Vue 3 · Composition API | Spring Boot 3 |
-| TypeScript | MyBatis-Plus |
-| Element Plus | Spring Security + JWT |
-| Pinia + persistedstate | MySQL 8.0 |
-| Axios · SSE ReadableStream | Spring AI + DeepSeek |
-| Vite · SCSS · ESLint | Maven |
+| 前端                       | 后端                  |
+| -------------------------- | --------------------- |
+| Vue 3 · Composition API    | Spring Boot 3         |
+| TypeScript                 | MyBatis-Plus          |
+| Element Plus               | Spring Security + JWT |
+| Pinia + persistedstate     | MySQL 8.0             |
+| Axios · SSE ReadableStream | Spring AI + DeepSeek  |
+| Vite · SCSS · ESLint       | Maven                 |
 
 ## 项目结构
 
@@ -78,6 +78,12 @@ docker compose up -d
 ```
 
 访问 `http://localhost:3000`，默认测试账号 `zhangsan` / `admin123`。Swagger 文档 `http://localhost:8080/swagger-ui.html`。
+
+### 停止8080
+
+```
+powershell -Command "Stop-Process -Id (Get-NetTCPConnection -LocalPort 8080).OwningProcess -Force"
+```
 
 ## 实现亮点
 
