@@ -22,10 +22,10 @@ export interface User {
   nickname: string
   avatar: string
   gender: number
+  role?: string
   cardType?: string
   cardStartDate?: string
   cardEndDate?: string
-  status: number
   createdAt?: string
 }
 
@@ -54,7 +54,9 @@ export interface Course {
   endTime: string
   maxCapacity: number
   currentCount: number
+  price?: number
   description: string
+  location?: string
   status: number
   registered?: boolean
 }
@@ -98,6 +100,7 @@ export interface RegisterForm {
   username: string
   phone: string
   password: string
+  role?: string
 }
 
 // 登录/注册响应
@@ -106,6 +109,37 @@ export interface AuthResult {
   nickname: string
   avatar: string
   userId: string
+  role: string
+}
+
+// 管理员仪表盘
+export interface AdminDashboard {
+  totalUsers: number
+  totalCourses: number
+  totalCoaches: number
+  todayCheckins: number
+  monthlyRevenue: number
+}
+
+// 教练日程项
+export interface CoachScheduleItem {
+  courseId: number
+  courseName: string
+  courseDate: string
+  startTime: string
+  endTime: string
+  location: string
+  price: number
+  maxCapacity: number
+  currentCount: number
+  memberName: string
+  memberPhone: string
+}
+
+// 图表统计数据
+export interface DashboardStats {
+  enrollmentTrend: { month: string; count: number }[]
+  revenueByMonth: { month: string; amount: number }[]
 }
 
 // 聊天消息
@@ -122,6 +156,7 @@ declare module 'vue-router' {
     title?: string
     showTabBar?: boolean
     requiresAuth?: boolean
+    roles?: string[]
     icon?: string
     transition?: string
   }

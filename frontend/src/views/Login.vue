@@ -129,7 +129,9 @@ const handleLogin = async () => {
         localStorage.removeItem('gymai_remember')
       }
       ElMessage.success('登录成功')
-      const redirect = (route.query.redirect as string) || '/home'
+      // 根据角色跳转到不同首页
+      const redirect = (route.query.redirect as string) ||
+        (userStore.isAdmin ? '/admin/dashboard' : userStore.isCoach ? '/coach/dashboard' : '/home')
       router.push(redirect)
     } catch {
       // error handled by interceptor

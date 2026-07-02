@@ -2,6 +2,7 @@ package com.gymai.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -18,7 +19,9 @@ public class Course {
     private LocalTime endTime;
     private Integer maxCapacity;
     private Integer currentCount;
+    private BigDecimal price;
     private String description;
+    private String location;
     private Integer status;
     @TableField(exist = false)
     private String coachName;

@@ -32,6 +32,14 @@
         <span class="info-label">教练</span>
         <span class="info-value link" @click="$router.push(`/coaches/${course.coachId}`)">{{ course.coachName }}</span>
       </div>
+      <div class="info-row" v-if="course.price">
+        <span class="info-label">价格</span>
+        <span class="info-value price">¥{{ course.price }}</span>
+      </div>
+      <div class="info-row" v-if="course.location">
+        <span class="info-label">地点</span>
+        <span class="info-value">{{ course.location }}</span>
+      </div>
       <div class="info-row">
         <span class="info-label">描述</span>
         <span class="info-value">{{ course.description || '暂无描述' }}</span>

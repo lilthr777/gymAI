@@ -17,6 +17,13 @@
         <el-form-item prop="confirmPassword">
           <el-input v-model="form.confirmPassword" type="password" placeholder="确认密码" :prefix-icon="Lock" show-password />
         </el-form-item>
+        <el-form-item prop="role">
+          <el-radio-group v-model="form.role">
+            <el-radio-button value="MEMBER">👤 会员注册</el-radio-button>
+            <el-radio-button value="COACH">💪 教练注册</el-radio-button>
+            <el-radio-button value="ADMIN">⚙️ 管理员注册</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" class="register-btn" @click="handleRegister">
             {{ loading ? '注册中...' : '注 册' }}
@@ -49,6 +56,7 @@ const form = reactive({
   phone: '',
   password: '',
   confirmPassword: '',
+  role: 'MEMBER',
 })
 
 const validateConfirmPassword = (_rule: any, value: string, callback: any) => {
@@ -88,10 +96,18 @@ const handleRegister = async () => {
         username: form.username,
         phone: form.phone,
         password: form.password,
+        role: form.role,
       })
       userStore.setLoginInfo(res.data)
       ElMessage.success('注册成功')
-      router.push('/home')
+      // 根据角色跳转
+      if (res.data.role === 'ADMIN') {
+        router.push('/admin/dashboard')
+      } else if (res.data.role === 'COACH') {
+        router.push('/coach/dashboard')
+      } else {
+        router.push('/home')
+      }
     } catch {
       // error handled by interceptor
     } finally {

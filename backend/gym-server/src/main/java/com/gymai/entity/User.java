@@ -16,10 +16,10 @@ public class User {
     private String nickname;
     private String avatar;
     private Integer gender;
+    private String role;
     private String cardType;
     private LocalDate cardStartDate;
     private LocalDate cardEndDate;
-    private Integer status;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
     @TableField(fill = FieldFill.INSERT_UPDATE)

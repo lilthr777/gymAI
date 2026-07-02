@@ -15,6 +15,12 @@
           </button>
           <template #dropdown>
             <el-dropdown-menu>
+              <el-dropdown-item v-if="userStore.isAdmin" @click="router.push('/admin/dashboard')">
+                ⚙️ 管理后台
+              </el-dropdown-item>
+              <el-dropdown-item v-if="userStore.isCoach" @click="router.push('/coach/dashboard')">
+                📅 教练后台
+              </el-dropdown-item>
               <el-dropdown-item @click="router.push('/profile')">个人资料</el-dropdown-item>
               <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
             </el-dropdown-menu>

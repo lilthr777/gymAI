@@ -1,10 +1,11 @@
 import request from '@/utils/request'
-import type { ApiResponse, PageResult, User, Coach, Course, Checkin, HomeData, LoginForm, RegisterForm, AuthResult } from '@/types'
+import type { ApiResponse, PageResult, User, Coach, Course, Checkin, HomeData, LoginForm, RegisterForm, AuthResult, AdminDashboard, CoachScheduleItem, DashboardStats } from '@/types'
 
 // 认证
 export const authApi = {
   login: (data: LoginForm) => request.post<any, ApiResponse<AuthResult>>('/api/auth/login', data),
   register: (data: RegisterForm) => request.post<any, ApiResponse<AuthResult>>('/api/auth/register', data),
+  me: () => request.get<any, ApiResponse<{ userId: string; username: string; role: string }>>('/api/auth/me'),
 }
 
 // 上传
@@ -69,6 +70,34 @@ export const favoriteApi = {
 export const cardApi = {
   info: () => request.get<any, ApiResponse<any>>('/api/card'),
   renew: (cardType: string) => request.post<any, ApiResponse<any>>('/api/card/renew', { cardType }),
+}
+
+// 管理员后台
+export const adminApi = {
+  dashboard: () => request.get<any, ApiResponse<AdminDashboard>>('/api/admin/dashboard'),
+  stats: () => request.get<any, ApiResponse<DashboardStats>>('/api/admin/dashboard/stats'),
+  users: (params: { pageNum: number; pageSize: number; keyword?: string; role?: string }) =>
+    request.get<any, ApiResponse<PageResult<User>>>('/api/admin/users', { params }),
+  updateUser: (id: number, data: Partial<User>) =>
+    request.put<any, ApiResponse<null>>(`/api/admin/users/${id}`, data),
+  deleteUser: (id: number) =>
+    request.delete<any, ApiResponse<null>>(`/api/admin/users/${id}`),
+  createCoach: (data: Partial<Coach>) => request.post<any, ApiResponse<null>>('/api/admin/coaches', data),
+  updateCoach: (id: number, data: Partial<Coach>) =>
+    request.put<any, ApiResponse<null>>(`/api/admin/coaches/${id}`, data),
+  deleteCoach: (id: number) => request.delete<any, ApiResponse<null>>(`/api/admin/coaches/${id}`),
+  adminCourses: (params: { pageNum: number; pageSize: number }) =>
+    request.get<any, ApiResponse<PageResult<Course>>>('/api/admin/courses', { params }),
+  createCourse: (data: Partial<Course>) => request.post<any, ApiResponse<null>>('/api/admin/courses', data),
+  updateCourse: (id: number, data: Partial<Course>) =>
+    request.put<any, ApiResponse<null>>(`/api/admin/courses/${id}`, data),
+  deleteCourse: (id: number) => request.delete<any, ApiResponse<null>>(`/api/admin/courses/${id}`),
+}
+
+// 教练后台
+export const coachBackendApi = {
+  schedule: () => request.get<any, ApiResponse<CoachScheduleItem[]>>('/api/coach/schedule'),
+  dashboard: () => request.get<any, ApiResponse<AdminDashboard>>('/api/coach/dashboard'),
 }
 
 // AI 聊天

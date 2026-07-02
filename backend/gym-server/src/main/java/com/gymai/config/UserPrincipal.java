@@ -1,4 +1,4 @@
 package com.gymai.config;
 
-public record UserPrincipal(Long userId, String username) {
+public record UserPrincipal(Long userId, String username, String role) {
 }

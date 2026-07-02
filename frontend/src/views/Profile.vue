@@ -44,7 +44,7 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const profile = reactive<User>({
-  username: '', phone: '', nickname: '', avatar: '', gender: 0, status: 1,
+  username: '', phone: '', nickname: '', avatar: '', gender: 0,
 })
 
 const cardLabel = computed(() => {

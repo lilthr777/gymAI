@@ -23,7 +23,6 @@ public class UserServiceImpl implements UserService {
         user.setId(userId);
         user.setPassword(null);
         user.setUsername(null);
-        user.setStatus(null);
         userMapper.updateById(user);
         return Result.ok();
     }

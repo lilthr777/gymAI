@@ -15,6 +15,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/Register.vue'),
     meta: { title: '注册', showTabBar: false },
   },
+  // C端应用（会员端）
   {
     path: '/',
     component: () => import('@/components/Layout.vue'),
@@ -88,6 +89,60 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
+  // 管理员后台
+  {
+    path: '/admin',
+    component: () => import('@/components/AdminLayout.vue'),
+    redirect: '/admin/dashboard',
+    meta: { roles: ['ADMIN'] },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'AdminDashboard',
+        component: () => import('@/views/admin/AdminDashboard.vue'),
+        meta: { title: '管理仪表盘', roles: ['ADMIN'] },
+      },
+      {
+        path: 'users',
+        name: 'AdminUsers',
+        component: () => import('@/views/admin/AdminUsers.vue'),
+        meta: { title: '用户管理', roles: ['ADMIN'] },
+      },
+      {
+        path: 'coaches',
+        name: 'AdminCoaches',
+        component: () => import('@/views/admin/AdminCoaches.vue'),
+        meta: { title: '教练管理', roles: ['ADMIN'] },
+      },
+      {
+        path: 'courses',
+        name: 'AdminCourses',
+        component: () => import('@/views/admin/AdminCourses.vue'),
+        meta: { title: '课程管理', roles: ['ADMIN'] },
+      },
+    ],
+  },
+  // 教练后台
+  {
+    path: '/coach',
+    component: () => import('@/components/CoachLayout.vue'),
+    redirect: '/coach/dashboard',
+    meta: { roles: ['COACH'] },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'CoachDashboard',
+        component: () => import('@/views/coach/CoachDashboard.vue'),
+        meta: { title: '教练仪表盘', roles: ['COACH'] },
+      },
+      {
+        path: 'schedule',
+        name: 'CoachSchedule',
+        component: () => import('@/views/coach/CoachSchedule.vue'),
+        meta: { title: '日程管理', roles: ['COACH'] },
+      },
+    ],
+  },
 ]
 
 const router = createRouter({
@@ -100,13 +155,38 @@ router.beforeEach((to, _from, next) => {
 
   const userStore = useUserStore()
 
+  // 需要登录但未登录 → 跳转登录页
   if (to.meta.requiresAuth && !userStore.isLoggedIn()) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
-  } else if (to.name === 'Login' && userStore.isLoggedIn()) {
-    next({ name: 'Home' })
-  } else {
-    next()
+    return
   }
+
+  // 已登录访问登录页 → 根据角色跳转
+  if (to.name === 'Login' && userStore.isLoggedIn()) {
+    if (userStore.isAdmin) next({ name: 'AdminDashboard' })
+    else if (userStore.isCoach) next({ name: 'CoachDashboard' })
+    else next({ name: 'Home' })
+    return
+  }
+
+  // 角色权限校验
+  const requiredRoles = to.meta.roles as string[] | undefined
+  if (requiredRoles && requiredRoles.length > 0) {
+    if (!userStore.isLoggedIn()) {
+      next({ name: 'Login', query: { redirect: to.fullPath } })
+      return
+    }
+    const hasRole = requiredRoles.includes(userStore.role)
+    if (!hasRole) {
+      // 跳转到对应角色的首页
+      if (userStore.isAdmin) next({ name: 'AdminDashboard' })
+      else if (userStore.isCoach) next({ name: 'CoachDashboard' })
+      else next({ name: 'Home' })
+      return
+    }
+  }
+
+  next()
 })
 
 export default router

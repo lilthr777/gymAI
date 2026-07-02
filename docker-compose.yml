@@ -25,6 +25,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      DB_HOST: mysql
       DB_USERNAME: root
       DB_PASSWORD: ${DB_PASSWORD:-root}
       JWT_SECRET: ${JWT_SECRET:-gymAI-JWT-Secret-Key-Must-Be-256-Bits-Long!!}

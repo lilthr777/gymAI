@@ -79,7 +79,7 @@ const avatarPreview = ref('')
 const fileInput = ref<HTMLInputElement>()
 
 const profile = reactive<User>({
-  username: '', phone: '', nickname: '', avatar: '', gender: 0, status: 1,
+  username: '', phone: '', nickname: '', avatar: '', gender: 0,
 })
 
 const form = reactive({ nickname: '', phone: '', gender: 0 })

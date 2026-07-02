@@ -14,6 +14,10 @@
       <span class="meta-sep">&middot;</span>
       <span>{{ course.currentCount }}/{{ course.maxCapacity }}人</span>
     </div>
+    <div class="card-extra" v-if="course.price || course.location">
+      <span v-if="course.price" class="card-price">¥{{ course.price }}</span>
+      <span v-if="course.location" class="card-location">📍 {{ course.location }}</span>
+    </div>
   </div>
 </template>
 
@@ -119,6 +123,24 @@ const statusClass = computed(() => {
 .card-time {
   font-weight: 500;
   color: $color-text-primary;
+}
+
+.card-extra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: $font-size-xs;
+}
+
+.card-price {
+  color: #ff9500;
+  font-weight: 600;
+}
+
+.card-location {
+  color: $color-text-secondary;
+  font-size: 11px;
 }
 
 html.dark {

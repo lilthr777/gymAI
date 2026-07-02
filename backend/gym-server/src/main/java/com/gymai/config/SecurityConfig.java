@@ -27,7 +27,13 @@ public class SecurityConfig {
             .cors(cors -> {})
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/coaches/**", "/api/courses/**", "/uploads/**", "/doc.html", "/v3/api-docs/**", "/webjars/**").permitAll()
+                // C端公开接口
+                .requestMatchers("/api/auth/**", "/api/coaches/**", "/api/courses/**",
+                    "/uploads/**", "/doc.html", "/v3/api-docs/**", "/webjars/**").permitAll()
+                // 管理员后台接口
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                // 教练后台接口
+                .requestMatchers("/api/coach/**").hasAnyRole("COACH", "ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
